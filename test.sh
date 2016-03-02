@@ -9,3 +9,4 @@ export AUTH_TOKEN=`grep 'Root Token' .test_output | sed 's#^.*: ##'`
 ~/src/ansible/hacking/test-module -m vault_seal.py -a "state=sealed tls=no token=${AUTH_TOKEN}"
 
 killall vault
+rm -f .test_output
