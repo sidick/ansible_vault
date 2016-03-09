@@ -13,7 +13,7 @@ chmod +x $PWD/bin/vault
 
 export PATH=$PATH:$PWD/bin
 
-vault server -dev &
+vault server -dev >/tmp/vault_output &
 
 sleep 1
 

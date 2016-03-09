@@ -10,4 +10,4 @@ install:
   - "pip install -r requirements.txt"
   - "make ci"
 before_script:
-script: ansible-playbook -i ./hosts test-vault.yml
+script: make test
