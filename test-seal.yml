@@ -10,13 +10,13 @@
   tasks:
     - include: test-vault-credentials.yml
 
-    - name: Seal the vault
+    - name: Seal the vault (Actually do it)
       vault_seal:
         token: "{{ vault_token }}"
         state: sealed
         tls: off
 
-    - name: Seal the vault
+    - name: Seal the vault (Should show no change)
       vault_seal:
         token: "{{ vault_token }}"
         state: sealed
