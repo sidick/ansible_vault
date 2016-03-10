@@ -3,8 +3,11 @@ cache: pip
 python:
   - "2.7"
 sudo: false
+notifications:
+  email:
+    - simond@irrelevant.org
 install:
   - "pip install -r requirements.txt"
   - "make ci"
 before_script:
-script: ansible-playbook -i ./hosts test-vault.yml
+script: make test

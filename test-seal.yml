@@ -7,3 +7,11 @@
   vars_files:
     - group_vars/vault
 
+  tasks:
+    - include: test-vault-credentials.yml
+
+    - name: Seal the vault
+      vault_seal:
+        token: "{{ vault_token }}"
+        state: sealed
+        tls: off
