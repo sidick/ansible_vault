@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import json
+
 DOCUMENTATION = '''
 ---
 module: vault_seal
@@ -92,6 +94,18 @@ def vault_seal(module, url, token):
 	module.exit_json(changed=True)
 
 
+def vault_seal_status(module, url):
+	# Return
+	seal_url = url + '/v1/sys/seal-status'
+
+	response, info = fetch_url(module, seal_url, method='GET')
+
+	if info['status'] == 200:
+		return json.loads(response.read())
+
+	module.fail_json(msg="Failed to get vault status")
+
+
 def main():
 
     module = AnsibleModule(
@@ -115,8 +129,13 @@ def main():
     
     url = make_vault_url(module, vault_server, vault_port, vault_tls)
     
-    if state == 'sealed':
-    	vault_seal(module, url, token)
+    seal_state = vault_seal_status(module, url)
+
+    if state == 'sealed' :
+        if not seal_state['sealed']:
+            vault_seal(module, url, token)
+        else:
+            module.exit_json(changed=False)
 
     module.fail_json(msg=url)
 
