@@ -85,6 +85,9 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 def vault_seal(module, url, token):
 	seal_url = url + '/v1/sys/seal'
 	headers = {"X-Vault-Token": token}
+	
+	if module.check_mode:
+	    module.exit_json(changed=True)
 
 	response, info = fetch_url(module, seal_url, method='POST', headers=headers)
 
@@ -98,6 +101,9 @@ def vault_unseal(module, url, token, key):
 	unseal_url = url + '/v1/sys/unseal'
 	headers = {"X-Vault-Token": token}
 	data = json.dumps({ 'key': key })
+
+	if module.check_mode:
+	    module.exit_json(changed=True)
 
 	response, info = fetch_url(module, unseal_url, method='POST', headers=headers, data = data)
 
@@ -125,6 +131,9 @@ def vault_reset(module, url, token):
 	headers = {"X-Vault-Token": token}
 	data = json.dumps({ 'reset': True })
 
+	if module.check_mode:
+	    module.exit_json(changed=True)
+
 	response, info = fetch_url(module, reset_url, method='POST', headers=headers, data = data)
 
 	if info['status'] != 200 and info['status'] != 204:
@@ -147,7 +156,7 @@ def main():
             tls=dict(required=False, default=True, type='bool'),
             validate_certs=dict(required=False, default=True, type='bool')
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     state = module.params['state']
