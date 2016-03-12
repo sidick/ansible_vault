@@ -95,19 +95,19 @@ def vault_seal(module, url, token):
 
 
 def vault_unseal(module, url, token, key):
-	seal_url = url + '/v1/sys/unseal?key=' + key
+	unseal_url = url + '/v1/sys/unseal'
 	headers = {"X-Vault-Token": token}
-	data = "{\"key\": \"" + key + "\"}"
+	data = json.dumps({ 'key': key })
 
-	response, info = fetch_url(module, seal_url, method='POST', headers=headers, data = data)
+	response, info = fetch_url(module, unseal_url, method='POST', headers=headers, data = data)
 
 	if info['status'] != 200 and info['status'] != 204:
 		module.fail_json(msg="Unable to unseal vault")
 	
-	module.exit_json(changed=True)
+	module.exit_json(changed=True, msg=response.read())
+
 
 def vault_seal_status(module, url):
-	# Return
 	seal_url = url + '/v1/sys/seal-status'
 
 	response, info = fetch_url(module, seal_url, method='GET')
