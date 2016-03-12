@@ -120,6 +120,21 @@ def vault_seal_status(module, url):
 	module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
 
 
+def vault_reset(module, url, token):
+	reset_url = url + '/v1/sys/unseal'
+	headers = {"X-Vault-Token": token}
+	data = json.dumps({ 'reset': True })
+
+	response, info = fetch_url(module, reset_url, method='POST', headers=headers, data = data)
+
+	if info['status'] != 200 and info['status'] != 204:
+		module.fail_json(msg="Unable to reset vault unseal (%s)" % info['msg'])
+	
+	result = json.loads(response.read())
+	
+	module.exit_json(changed=True, **result)
+
+
 def main():
 
     module = AnsibleModule(
@@ -156,6 +171,11 @@ def main():
             vault_unseal(module, url, token, key)
         else:
             module.exit_json(changed=False)
+    if state == 'reset':
+        if seal_state['sealed']:
+            vault_reset(module, url, token)
+        else:
+            module.exit_json(changed=False, msg="Vault already unsealed")
 
     return module.fail_json(msg="Unknown usage")
 
