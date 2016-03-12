@@ -4,7 +4,7 @@
 #
 set -ev
 
-VAULT_VER=0.5.1
+#VAULT_VER=0.5.1
 VAULT_DL_URL=https://releases.hashicorp.com/vault/${VAULT_VER}/vault_${VAULT_VER}_linux_amd64.zip
 
 curl -L $VAULT_DL_URL > vault.zip
