@@ -1,5 +1,5 @@
 ---
 
 # Sealing test playbook
-- include: test-seal.yml
+- include: playbooks/test-seal.yml
 
