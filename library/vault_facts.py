@@ -32,7 +32,7 @@ options:
     default: 'yes'
     choices: ['yes', 'no']
   validate_certs:
-    description: 
+    description:
       - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
     required: false
     default: 'yes'
@@ -51,46 +51,46 @@ EXAMPLES = '''
 
 
 def make_vault_url(module, vault_server, vault_port, vault_tls):
-	vault_url = ''
-	if vault_tls:
-		vault_url = 'https://'
-	else:
-		vault_url = 'http://'
-	
-	vault_url = vault_url + vault_server + ':' + str(vault_port)
-	
-	return vault_url
+    vault_url = ''
+    if vault_tls:
+        vault_url = 'https://'
+    else:
+        vault_url = 'http://'
+
+    vault_url = vault_url + vault_server + ':' + str(vault_port)
+
+    return vault_url
 
 
 def vault_seal_status(module, url):
-	seal_url = url + '/v1/sys/seal-status'
+    seal_url = url + '/v1/sys/seal-status'
 
-	response, info = fetch_url(module, seal_url, method='GET')
+    response, info = fetch_url(module, seal_url, method='GET')
 
-	if info['status'] == 200:
-		return json.loads(response.read())
+    if info['status'] == 200:
+        return json.loads(response.read())
 
-	module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
+    module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
 
 
 def vault_leader_status(module, url):
-	seal_url = url + '/v1/sys/leader'
+    seal_url = url + '/v1/sys/leader'
 
-	response, info = fetch_url(module, seal_url, method='GET')
+    response, info = fetch_url(module, seal_url, method='GET')
 
-	if info['status'] == 200:
-		return json.loads(response.read())
+    if info['status'] == 200:
+        return json.loads(response.read())
 
-	module.fail_json(msg="Failed to get vault leader status (%s)" % info['msg'])
+    module.fail_json(msg="Failed to get vault leader status (%s)" % info['msg'])
 
 
 def vault_facts(module, url):
-	results1 = vault_seal_status(module, url)
-	results2 = vault_leader_status(module, url)
-	
-	results = dict(results1, **results2)
-	
-	module.exit_json(changed=False, **results)
+    results1 = vault_seal_status(module, url)
+    results2 = vault_leader_status(module, url)
+
+    results = dict(results1, **results2)
+
+    module.exit_json(changed=False, **results)
 
 
 def main():
@@ -110,11 +110,11 @@ def main():
     vault_port = module.params['port']
     vault_server = module.params['server']
     vault_tls = module.params['tls']
-    
+
     url = make_vault_url(module, vault_server, vault_port, vault_tls)
-    
+
     vault_facts(module, url)
-    
+
     return module.fail_json(msg="Can't gather Vault facts")
 
 

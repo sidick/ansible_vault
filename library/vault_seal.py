@@ -45,7 +45,7 @@ options:
     default: 'yes'
     choices: ['yes', 'no']
   validate_certs:
-    description: 
+    description:
       - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
     required: false
     default: 'yes'
@@ -71,77 +71,77 @@ EXAMPLES = '''
 
 
 def make_vault_url(module, vault_server, vault_port, vault_tls):
-	vault_url = ''
-	if vault_tls:
-		vault_url = 'https://'
-	else:
-		vault_url = 'http://'
-	
-	vault_url = vault_url + vault_server + ':' + str(vault_port)
-	
-	return vault_url
+    vault_url = ''
+    if vault_tls:
+        vault_url = 'https://'
+    else:
+        vault_url = 'http://'
+
+    vault_url = vault_url + vault_server + ':' + str(vault_port)
+
+    return vault_url
 
 
 def vault_seal(module, url, token):
-	seal_url = url + '/v1/sys/seal'
-	headers = {"X-Vault-Token": token}
-	
-	if module.check_mode:
-	    module.exit_json(changed=True)
+    seal_url = url + '/v1/sys/seal'
+    headers = {"X-Vault-Token": token}
 
-	response, info = fetch_url(module, seal_url, method='POST', headers=headers)
+    if module.check_mode:
+        module.exit_json(changed=True)
 
-	if info['status'] != 200 and info['status'] != 204:
-		module.fail_json(msg="Failed to seal vault")
-	
-	module.exit_json(changed=True)
+    response, info = fetch_url(module, seal_url, method='POST', headers=headers)
+
+    if info['status'] != 200 and info['status'] != 204:
+        module.fail_json(msg="Failed to seal vault")
+
+    module.exit_json(changed=True)
 
 
 def vault_unseal(module, url, token, key):
-	unseal_url = url + '/v1/sys/unseal'
-	headers = {"X-Vault-Token": token}
-	data = json.dumps({ 'key': key })
+    unseal_url = url + '/v1/sys/unseal'
+    headers = {"X-Vault-Token": token}
+    data = json.dumps({'key': key})
 
-	if module.check_mode:
-	    module.exit_json(changed=True)
+    if module.check_mode:
+        module.exit_json(changed=True)
 
-	response, info = fetch_url(module, unseal_url, method='POST', headers=headers, data = data)
+    response, info = fetch_url(module, unseal_url, method='POST', headers=headers, data=data)
 
-	if info['status'] != 200 and info['status'] != 204:
-		module.fail_json(msg="Unable to unseal vault (%s)" % info['msg'])
-	
-	result = json.loads(response.read())
-	
-	module.exit_json(changed=True, **result)
+    if info['status'] != 200 and info['status'] != 204:
+        module.fail_json(msg="Unable to unseal vault (%s)" % info['msg'])
+
+    result = json.loads(response.read())
+
+    module.exit_json(changed=True, **result)
 
 
 def vault_seal_status(module, url):
-	seal_url = url + '/v1/sys/seal-status'
+    seal_url = url + '/v1/sys/seal-status'
 
-	response, info = fetch_url(module, seal_url, method='GET')
+    response, info = fetch_url(module, seal_url, method='GET')
 
-	if info['status'] == 200:
-		return json.loads(response.read())
+    if info['status'] == 200:
+        return json.loads(response.read())
 
-	module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
+    module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
 
 
 def vault_reset(module, url, token):
-	reset_url = url + '/v1/sys/unseal'
-	headers = {"X-Vault-Token": token}
-	data = json.dumps({ 'reset': True })
+    reset_url = url + '/v1/sys/unseal'
+    headers = {"X-Vault-Token": token}
+    data = json.dumps({'reset': True})
 
-	if module.check_mode:
-	    module.exit_json(changed=True)
+    if module.check_mode:
+        module.exit_json(changed=True)
 
-	response, info = fetch_url(module, reset_url, method='POST', headers=headers, data = data)
+    response, info = fetch_url(module, reset_url, method='POST', headers=headers, data=data)
 
-	if info['status'] != 200 and info['status'] != 204:
-		module.fail_json(msg="Unable to reset vault unseal (%s)" % info['msg'])
-	
-	result = json.loads(response.read())
-	
-	module.exit_json(changed=True, **result)
+    if info['status'] != 200 and info['status'] != 204:
+        module.fail_json(msg="Unable to reset vault unseal (%s)" % info['msg'])
+
+    result = json.loads(response.read())
+
+    module.exit_json(changed=True, **result)
 
 
 def main():
@@ -165,12 +165,12 @@ def main():
     vault_port = module.params['port']
     vault_server = module.params['server']
     vault_tls = module.params['tls']
-    
+
     url = make_vault_url(module, vault_server, vault_port, vault_tls)
 
     seal_state = vault_seal_status(module, url)
 
-    if state == 'sealed' :
+    if state == 'sealed':
         if not seal_state['sealed']:
             vault_seal(module, url, token)
         else:
