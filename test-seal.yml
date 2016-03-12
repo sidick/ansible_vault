@@ -21,3 +21,17 @@
         token: "{{ vault_token }}"
         state: sealed
         tls: off
+
+    - name: Unseal the vault
+      vault_seal:
+        token: "{{ vault_token }}"
+        key: "{{ unseal_key }}"
+        state: unsealed
+        tls: off
+
+    - name: Unseal the vault (Should show no change)
+      vault_seal:
+        token: "{{ vault_token }}"
+        key: "{{ unseal_key }}"
+        state: unsealed
+        tls: off
