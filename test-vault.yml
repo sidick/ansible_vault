@@ -2,4 +2,4 @@
 
 # Sealing test playbook
 - include: playbooks/test-seal.yml
-
+- include: playbooks/test-facts.yml
