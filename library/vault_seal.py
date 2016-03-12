@@ -95,19 +95,21 @@ def vault_seal(module, url, token):
 
 
 def vault_unseal(module, url, token, key):
-	seal_url = url + '/v1/sys/unseal?key=' + key
+	unseal_url = url + '/v1/sys/unseal'
 	headers = {"X-Vault-Token": token}
-	data = "{\"key\": \"" + key + "\"}"
+	data = json.dumps({ 'key': key })
 
-	response, info = fetch_url(module, seal_url, method='POST', headers=headers, data = data)
+	response, info = fetch_url(module, unseal_url, method='POST', headers=headers, data = data)
 
 	if info['status'] != 200 and info['status'] != 204:
-		module.fail_json(msg="Unable to unseal vault")
+		module.fail_json(msg="Unable to unseal vault (%s)" % info['msg'])
 	
-	module.exit_json(changed=True)
+	result = json.loads(response.read())
+	
+	module.exit_json(changed=True, **result)
+
 
 def vault_seal_status(module, url):
-	# Return
 	seal_url = url + '/v1/sys/seal-status'
 
 	response, info = fetch_url(module, seal_url, method='GET')
@@ -115,7 +117,22 @@ def vault_seal_status(module, url):
 	if info['status'] == 200:
 		return json.loads(response.read())
 
-	module.fail_json(msg="Failed to get vault status")
+	module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
+
+
+def vault_reset(module, url, token):
+	reset_url = url + '/v1/sys/unseal'
+	headers = {"X-Vault-Token": token}
+	data = json.dumps({ 'reset': True })
+
+	response, info = fetch_url(module, reset_url, method='POST', headers=headers, data = data)
+
+	if info['status'] != 200 and info['status'] != 204:
+		module.fail_json(msg="Unable to reset vault unseal (%s)" % info['msg'])
+	
+	result = json.loads(response.read())
+	
+	module.exit_json(changed=True, **result)
 
 
 def main():
@@ -154,6 +171,11 @@ def main():
             vault_unseal(module, url, token, key)
         else:
             module.exit_json(changed=False)
+    if state == 'reset':
+        if seal_state['sealed']:
+            vault_reset(module, url, token)
+        else:
+            module.exit_json(changed=False, msg="Vault already unsealed")
 
     return module.fail_json(msg="Unknown usage")
 

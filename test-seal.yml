@@ -22,6 +22,12 @@
         state: sealed
         tls: off
 
+    - name: Reset the vault unseal process
+      vault_seal:
+        token: "{{ vault_token }}"
+        state: reset
+        tls: off
+
     - name: Unseal the vault
       vault_seal:
         token: "{{ vault_token }}"
@@ -35,3 +41,4 @@
         key: "{{ unseal_key }}"
         state: unsealed
         tls: off
+
