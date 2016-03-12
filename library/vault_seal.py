@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import json
+
 DOCUMENTATION = '''
 ---
 module: vault_seal
@@ -92,6 +94,30 @@ def vault_seal(module, url, token):
 	module.exit_json(changed=True)
 
 
+def vault_unseal(module, url, token, key):
+	seal_url = url + '/v1/sys/unseal?key=' + key
+	headers = {"X-Vault-Token": token}
+	data = "{\"key\": \"" + key + "\"}"
+
+	response, info = fetch_url(module, seal_url, method='POST', headers=headers, data = data)
+
+	if info['status'] != 200 and info['status'] != 204:
+		module.fail_json(msg="Unable to unseal vault")
+	
+	module.exit_json(changed=True)
+
+def vault_seal_status(module, url):
+	# Return
+	seal_url = url + '/v1/sys/seal-status'
+
+	response, info = fetch_url(module, seal_url, method='GET')
+
+	if info['status'] == 200:
+		return json.loads(response.read())
+
+	module.fail_json(msg="Failed to get vault status")
+
+
 def main():
 
     module = AnsibleModule(
@@ -109,26 +135,25 @@ def main():
 
     state = module.params['state']
     token = module.params['token']
+    key = module.params['key']
     vault_port = module.params['port']
     vault_server = module.params['server']
     vault_tls = module.params['tls']
     
     url = make_vault_url(module, vault_server, vault_port, vault_tls)
-    
-    if state == 'sealed':
-    	vault_seal(module, url, token)
 
-    module.fail_json(msg=url)
+    seal_state = vault_seal_status(module, url)
 
-    #token = module.params['token']
-    #backend = module.params['backend']
-    #name = module.params['name']
-
-    #if (state):
-    #    if (not backend):
-    #        module.fail_json(msg="Need to specify backend with the state")
-
-    #    change_state(module, secret, state, backend, name)
+    if state == 'sealed' :
+        if not seal_state['sealed']:
+            vault_seal(module, url, token)
+        else:
+            module.exit_json(changed=False)
+    if state == 'unsealed':
+        if seal_state['sealed']:
+            vault_unseal(module, url, token, key)
+        else:
+            module.exit_json(changed=False)
 
     return module.fail_json(msg="Unknown usage")
 
