@@ -175,6 +175,35 @@ def mount_absent(module, url):
     module.exit_json(changed=True)
 
 
+def mount_remount(module, url):
+    mount_url = url + '/v1/sys/remount'
+    headers = {"X-Vault-Token": module.params['token']}
+
+    data = {
+        'from': module.params['mountpoint'],
+        'to': module.params['new_mountpoint']
+    }
+
+    data_json = json.dumps(data)
+
+    #module.fail_json(msg="Unknown", **data)
+
+    mount_list = get_mounts(module, url)
+
+    if module.params['mountpoint']+'/' not in mount_list:
+        module.fail_json(msg="Mountpoint '%s' not available to remount" % module.params['mountpoint'])
+
+    if module.params['new_mountpoint']+'/' in mount_list:
+        module.fail_json(msg="New mountpoint already exists: %s" % module.params['new_mountpoint'])
+
+    response, info = fetch_url(module, mount_url, method='POST', headers=headers, data=data_json)
+
+    if info['status'] != 204 and info['status'] != 200:
+        module.fail_json(msg="Unable to remount '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+
+    module.exit_json(changed=True, msg="blah", **data)
+
+
 def main():
 
     module = AnsibleModule(
@@ -207,6 +236,8 @@ def main():
         mount_present(module, url)
     if state == 'absent':
         mount_absent(module, url)
+    if state == 'remount':
+        mount_remount(module, url)
 
 
 
