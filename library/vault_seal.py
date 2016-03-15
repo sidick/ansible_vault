@@ -56,17 +56,21 @@ EXAMPLES = '''
 # Seal the vault
 
 - vault_seal:
-    token=XXXXXXXX state=sealed
+    token: XXXXXXXX
+    state: sealed
 
 # Unseal the vault
 
 - vault_seal:
-    token=XXXXXXXX state=unsealed key=XXXXXX
+    token: XXXXXXXX
+    state: unsealed
+    key: XXXXXX
 
 # Reset the unseal process
 
 - vault_seal:
-    token=XXXXXXXX state=reset
+    token: XXXXXXXX
+    state: reset
 '''
 
 
