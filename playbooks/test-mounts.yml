@@ -27,3 +27,17 @@
         type: generic
         description: 'Generic test backend'
         mountpoint: test1
+
+    - name: Unmount backend
+      vault_mount:
+        token: "{{ vault_token }}"
+        tls: off
+        state: absent
+        mountpoint: test1
+
+    - name: Unmount backend (should show no changes)
+      vault_mount:
+        token: "{{ vault_token }}"
+        tls: off
+        state: absent
+        mountpoint: test1

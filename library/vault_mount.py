@@ -157,6 +157,23 @@ def mount_present(module, url):
     module.exit_json(changed=True, **data)
 
 
+def mount_absent(module, url):
+    mount_url = url + '/v1/sys/mounts/' + module.params['mountpoint']
+    headers = {"X-Vault-Token": module.params['token']}
+
+    mount_list = get_mounts(module, url)
+
+    if module.params['mountpoint']+'/' not in mount_list:
+        module.exit_json(change=False)
+
+    response, info = fetch_url(module, mount_url, method='DELETE', headers=headers)
+
+    if info['status'] != 204 and info['status'] != 200:
+        module.fail_json(msg="Unable to unmount '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+
+    module.exit_json(changed=True)
+
+
 def main():
 
     module = AnsibleModule(
@@ -187,6 +204,8 @@ def main():
 
     if state == 'present':
         mount_present(module, url)
+    if state == 'absent':
+        mount_absent(module, url)
 
 
 
