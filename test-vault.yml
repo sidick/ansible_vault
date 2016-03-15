@@ -4,3 +4,4 @@
 - include: playbooks/test-seal.yml
 - include: playbooks/test-facts.yml
 - include: playbooks/test-secrets.yml
+- include: playbooks/test-mounts.yml
