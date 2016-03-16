@@ -120,7 +120,7 @@ def auth_present(module, url):
     auth_list = get_auth_backends(module, url)
 
     if module.params['mountpoint']+'/' in auth_list:
-        module.exit_json(change=False, **data)
+        module.exit_json(changed=False, **data)
 
     response, info = fetch_url(module, auth_url, method='POST', headers=headers, data=data_json)
 
@@ -137,7 +137,7 @@ def auth_absent(module, url):
     auth_list = get_auth_backends(module, url)
 
     if module.params['mountpoint']+'/' not in auth_list:
-        module.exit_json(change=False)
+        module.exit_json(changed=False)
 
     response, info = fetch_url(module, auth_url, method='DELETE', headers=headers)
 
