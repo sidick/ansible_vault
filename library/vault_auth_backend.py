@@ -7,7 +7,7 @@ DOCUMENTATION = '''
 module: vault_auth_backend
 short_description: Manage Vault Authentication Backends
 description:
-  - Add and Remove Vault authentication tokens
+  - Add and Remove Vault authentication backends
 options:
   token:
     description:
