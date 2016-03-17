@@ -25,6 +25,10 @@ options:
     description:
       - The name of the policy
     required: true
+  policy:
+    description:
+      - The policy to create
+    required: false
   server:
     description:
       - Hostname used to connect to the Vault server
@@ -94,32 +98,20 @@ def get_policies(module, url):
 
 
 def policy_present(module, url):
-    module.exit_json(changed=False)
-    policy_url = url + '/v1/sys/mounts/' + module.params['policy_name']
+    policy_url = url + '/v1/sys/policy/' + module.params['policy_name']
     headers = {"X-Vault-Token": module.params['token']}
 
     data = {
-        'type': module.params['type'],
-        'description': module.params['description'],
-        'config': {
-            'default_lease_ttl': str(module.params['default_lease_ttl']),
-            'max_lease_ttl': str(module.params['max_lease_ttl'])
-        }
+        'rules': module.params['policy'],
     }
     data_json = json.dumps(data)
-
-    policy_list = get_policies(module, url)
-
-    if module.params['policy'] in policy_list['policies']:
-        # TODO: Add code in here to change the policy details
-        module.exit_json(changed=False, **data)
 
     response, info = fetch_url(module, policy_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
         module.fail_json(msg="Unable to create policy '%s' (%s)" % (module.params['policy'], info['msg']))
 
-    module.exit_json(changed=True, **data)
+    module.exit_json(changed=True)
 
 
 def policy_absent(module, url):
@@ -147,6 +139,7 @@ def main():
             state=dict(required=True, choices=['present', 'absent']),
             server=dict(required=False, default='localhost', type='str'),
             policy_name=dict(required=True, default=None, type='str'),
+            policy=dict(required=False, default=None, type='str'),
             port=dict(required=False, default=8200, type='int'),
             tls=dict(required=False, default=True, type='bool'),
             validate_certs=dict(required=False, default=True, type='bool')

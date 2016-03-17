@@ -10,36 +10,39 @@
   tasks:
     - include: test-vault-credentials.yml
 
-#    - name: Create policy (using policy arguement)
-#      vault_policy:
-#        token: "{{ vault_token }}"
-#        tls: off
-#        state: present
-#        policy_name: 'test_policy'
-#        path: 'secret/*'
-#        policy: 'read'
-#
-#    - name: Create policy (using capabilities arguement)
-#      vault_policy:
-#        token: "{{ vault_token }}"
-#        tls: off
-#        state: present
-#        policy_name: 'test_policy2'
-#        path: 'secret/*'
-#        capabilities:
-#          - 'create'
-#          - 'sudo'
+    - name: Create policy1
+      vault_policy:
+        token: "{{ vault_token }}"
+        tls: off
+        state: present
+        policy_name: 'policy1'
+        policy: 'path "sys/*" { policy = "deny" }'
 
-    - name: Remove policy
+    - name: Create policy2
+      vault_policy:
+        token: "{{ vault_token }}"
+        tls: off
+        state: present
+        policy_name: 'policy2'
+        policy: "{{ lookup('file', '../data/sample_policy') }}"
+
+    - name: Remove policy1
       vault_policy:
         token: "{{ vault_token }}"
         tls: off
         state: absent
-        policy_name: 'test_policy'
+        policy_name: 'policy1'
 
-    - name: Remove policy (should be no changes)
+    - name: Remove policy1 (should be no changes)
       vault_policy:
         token: "{{ vault_token }}"
         tls: off
         state: absent
-        policy_name: 'test_policy'
+        policy_name: 'policy1'
+
+    - name: Remove policy2
+      vault_policy:
+        token: "{{ vault_token }}"
+        tls: off
+        state: absent
+        policy_name: 'policy2'
