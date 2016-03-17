@@ -11,8 +11,10 @@ with [Ansible] and [Vault]
 
 Currently the modules available include:
 
+* vault_auth_backend
 * vault_facts
 * vault_mount
+* vault_policy
 * vault_secret
 * vault_seal
 

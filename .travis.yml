@@ -8,6 +8,7 @@ env:
     - VAULT_VER="0.4.1"
     - VAULT_VER="0.5.0"
     - VAULT_VER="0.5.1"
+    - VAULT_VER="0.5.2"
 sudo: false
 notifications:
   email:

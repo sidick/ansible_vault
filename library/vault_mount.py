@@ -148,7 +148,7 @@ def mount_present(module, url):
 
     if module.params['mountpoint']+'/' in mount_list:
         # TODO: Add code in here to change the lease parameters
-        module.exit_json(change=False, **data)
+        module.exit_json(changed=False, **data)
 
     response, info = fetch_url(module, mount_url, method='POST', headers=headers, data=data_json)
 
@@ -165,7 +165,7 @@ def mount_absent(module, url):
     mount_list = get_mounts(module, url)
 
     if module.params['mountpoint']+'/' not in mount_list:
-        module.exit_json(change=False)
+        module.exit_json(changed=False)
 
     response, info = fetch_url(module, mount_url, method='DELETE', headers=headers)
 

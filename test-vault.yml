@@ -5,3 +5,5 @@
 - include: playbooks/test-facts.yml
 - include: playbooks/test-secrets.yml
 - include: playbooks/test-mounts.yml
+- include: playbooks/test-auth-backend.yml
+- include: playbooks/test-policy.yml
