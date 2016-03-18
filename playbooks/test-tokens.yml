@@ -10,23 +10,29 @@
   tasks:
     - include: test-vault-credentials.yml
 
-    - name: Create token
+    - name: Create token with specified name
       vault_token:
         token: "{{ vault_token }}"
         tls: off
         state: present
         id: 'test-token'
 
-    - name: Remove token
+    - name: Create token with no name
       vault_token:
         token: "{{ vault_token }}"
         tls: off
-        state: absent
-        id: 'test-token'
+        state: present
 
-    - name: Remove token (should be no changes)
-      vault_token:
-        token: "{{ vault_token }}"
-        tls: off
-        state: absent
-        id: 'test-token'
+#    - name: Remove token
+#      vault_token:
+#        token: "{{ vault_token }}"
+#        tls: off
+#        state: revoke
+#        id: 'test-token'
+#
+#    - name: Remove token (should be no changes)
+#      vault_token:
+#        token: "{{ vault_token }}"
+#        tls: off
+#        state: revoke
+#        id: 'test-token'

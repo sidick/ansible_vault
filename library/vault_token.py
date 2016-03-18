@@ -129,13 +129,17 @@ def token_present(module, url):
         'display_name': module.params['display_name'],
         'ttl': module.params['ttl'],
     }
+
+    if module.params['id']:
+        data['id'] = module.params['id']
+
+        token_details = get_auth_token(module, url, module.params['id'])
+
+        # If token already exists return unchanged
+        if token_details:
+            module.exit_json(change=False, **token_details['data'])
+
     data_json = json.dumps(data)
-
-    token_details = get_auth_token(module, url, module.params['id'])
-
-    # If token already exists return unchanged
-    if token_details:
-        module.exit_json(change=False, **token_details)
 
     response, info = fetch_url(module, auth_url, method='POST', headers=headers, data=data_json)
 
@@ -196,7 +200,7 @@ def main():
     if state == 'present':
         token_present(module, url)
     if state == 'absent':
-        auth_absent(module, url)
+        token_absent(module, url)
 
 
 
