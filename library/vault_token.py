@@ -142,7 +142,9 @@ def token_present(module, url):
     if info['status'] != 204 and info['status'] != 200:
         module.fail_json(msg="Unable to create token '%s' (%s)" % (module.params['id'], info['msg']))
 
-    module.exit_json(changed=True, **data)
+    ret = json.loads(response.read())
+
+    module.exit_json(changed=True, **ret['auth'])
 
 
 def token_absent(module, url):
