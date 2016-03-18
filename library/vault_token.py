@@ -17,10 +17,11 @@ options:
     description:
       - Lets you set the state of the authentication token
       - C(present) makes sure the token exists
-      - C(absent) makes sure the token doesn't exist
+      - C(renew) makes sure the token is renewed
+      - C(revoke) makes sure the token is revoked
     required: true
     default: null
-    choices: ['present', 'absent']
+    choices: ['present', 'renew', 'revoke']
   id:
     description:
       - The requested ID of the token, this can only be used when authenticating using a root token
@@ -178,7 +179,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, default=None, type='str'),
-            state=dict(required=True, choices=['present', 'absent', 'remount']),
+            state=dict(required=True, choices=['present', 'renew', 'revoke']),
             id=dict(required=False, default=None, type='str'),
             policies=dict(required=False, default=None, type='dict'),
             no_parent=dict(required=False, default=False, type='bool'),
