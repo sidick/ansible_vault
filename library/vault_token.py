@@ -133,7 +133,7 @@ def token_present(module, url):
 
     token_details = get_auth_token(module, url, module.params['id'])
 
-    # If token already exists return unchanged
+    # If token already exists return unchanged
     if token_details:
         module.exit_json(change=False, **token_details)
 
