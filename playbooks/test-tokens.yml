@@ -16,6 +16,30 @@
         tls: off
         state: present
         id: 'test-token'
+        num_uses: 1
+        no_default_policy: true
+    - name: Create token with specified name (should be no change)
+      vault_token:
+        token: "{{ vault_token }}"
+        tls: off
+        state: present
+        id: 'test-token'
+
+    - name: Create token with specified name
+      vault_token:
+        token: "{{ vault_token }}"
+        tls: off
+        state: present
+        id: 'test-token-orphan'
+        no_parent: true
+
+    - name: Create token with specified name (should be no change)
+      vault_token:
+        token: "{{ vault_token }}"
+        tls: off
+        state: present
+        id: 'test-token-orphan'
+        no_parent: true
 
     - name: Create token with no name
       vault_token:

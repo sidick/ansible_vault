@@ -127,8 +127,13 @@ def token_present(module, url):
 
     data = {
         'display_name': module.params['display_name'],
-        'ttl': module.params['ttl'],
+        'no_parent': module.params['no_parent'],
+        'num_uses': module.params['num_uses'],
+        'no_default_policy': module.params['no_default_policy']
     }
+
+    if module.params['ttl'] != '':
+        data['ttl'] = module.params['ttl']
 
     if module.params['id']:
         data['id'] = module.params['id']
@@ -178,7 +183,7 @@ def main():
             policies=dict(required=False, default=None, type='dict'),
             no_parent=dict(required=False, default=False, type='bool'),
             no_default_policy=dict(required=False, default=False, type='bool'),
-            ttl=dict(required=False, default=None, type='str'),
+            ttl=dict(required=False, default='', type='str'),
             display_name=dict(required=False, default='token', type='str'),\
             num_uses=dict(required=False, default=0, type='int'),
             server=dict(required=False, default='localhost', type='str'),
