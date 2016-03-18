@@ -136,6 +136,10 @@ def token_present(module, url):
     if module.params['ttl'] != '':
         data['ttl'] = module.params['ttl']
 
+    if module.params['policies']:
+        policy_list = "['" + "', '".join(module.params['policies']) + "']"
+        #data['policies'] = policy_list
+
     if module.params['id']:
         data['id'] = module.params['id']
 
@@ -146,6 +150,7 @@ def token_present(module, url):
             module.exit_json(change=False, **token_details['data'])
 
     data_json = json.dumps(data)
+    #module.fail_json(msg="%s" % data_json)
 
     response, info = fetch_url(module, auth_url, method='POST', headers=headers, data=data_json)
 
@@ -181,7 +186,7 @@ def main():
             token=dict(required=True, default=None, type='str'),
             state=dict(required=True, choices=['present', 'renew', 'revoke']),
             id=dict(required=False, default=None, type='str'),
-            policies=dict(required=False, default=None, type='dict'),
+            policies=dict(required=False, default=None, type='list'),
             no_parent=dict(required=False, default=False, type='bool'),
             no_default_policy=dict(required=False, default=False, type='bool'),
             ttl=dict(required=False, default='', type='str'),
