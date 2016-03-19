@@ -78,7 +78,6 @@ EXAMPLES = '''
     token: XXXXXXXX
     mountpoint: app-id
     state: absent
-    type: app-id
 
 '''
 
