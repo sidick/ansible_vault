@@ -7,4 +7,5 @@
 - include: playbooks/test-mounts.yml
 - include: playbooks/test-auth-backend.yml
 - include: playbooks/test-policy.yml
+- include: playbooks/test-auth.yml
 - include: playbooks/test-tokens.yml
