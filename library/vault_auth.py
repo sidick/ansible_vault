@@ -134,6 +134,7 @@ def vault_auth(module, url):
     ret = json.loads(response.read())
     module.exit_json(changed=True, **ret['auth'])
 
+
 def main():
 
     module = AnsibleModule(
