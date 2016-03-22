@@ -73,26 +73,14 @@ def vault_seal_status(module, url):
     module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
 
 
-def get_mounts(module, url):
-    mount_url = url + '/v1/sys/mounts'
+def get_list(module, url, type):
+    api_url = url + '/v1/sys/' + type
     headers = {"X-Vault-Token": module.params['token']}
 
-    response, info = fetch_url(module, mount_url, method='GET', headers=headers)
+    response, info = fetch_url(module, api_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch mount list (%s)" % info['msg'])
-
-    return json.loads(response.read())
-
-
-def get_audit_modules(module, url):
-    audit_url = url + '/v1/sys/audit'
-    headers = {"X-Vault-Token": module.params['token']}
-
-    response, info = fetch_url(module, audit_url, method='GET', headers=headers)
-
-    if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch audit list (%s)" % info['msg'])
+        module.fail_json(msg="Unable to fetch %s list (%s)" % (type, info['msg']))
 
     return json.loads(response.read())
 
@@ -115,8 +103,10 @@ def vault_facts(module, url):
     results = dict(results1, **results2)
 
     if module.params['token']:
-        results['mounts'] = get_mounts(module, url)
-        results['audit'] = get_audit_modules(module, url)
+        results['mounts'] = get_list(module, url, 'mounts')
+        results['audit'] = get_list(module, url, 'audit')
+        results['auth'] = get_list(module, url, 'auth')
+        results['policies'] = get_list(module, url, 'policy')['policies']
 
     module.exit_json(changed=False, **results)
 
