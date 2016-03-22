@@ -85,6 +85,18 @@ def get_mounts(module, url):
     return json.loads(response.read())
 
 
+def get_audit_modules(module, url):
+    audit_url = url + '/v1/sys/audit'
+    headers = {"X-Vault-Token": module.params['token']}
+
+    response, info = fetch_url(module, audit_url, method='GET', headers=headers)
+
+    if info['status'] != 200:
+        module.fail_json(msg="Unable to fetch audit list (%s)" % info['msg'])
+
+    return json.loads(response.read())
+
+
 def vault_leader_status(module, url):
     seal_url = url + '/v1/sys/leader'
 
@@ -104,6 +116,7 @@ def vault_facts(module, url):
 
     if module.params['token']:
         results['mounts'] = get_mounts(module, url)
+        results['audit'] = get_audit_modules(module, url)
 
     module.exit_json(changed=False, **results)
 
