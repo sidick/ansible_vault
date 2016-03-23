@@ -83,6 +83,7 @@ EXAMPLES = '''
 
 
 def make_vault_url(module, vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -95,6 +96,7 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def get_auth_backends(module, url):
+    """ Get the list of auth backends """
     auth_url = url + '/v1/sys/auth'
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -107,6 +109,7 @@ def get_auth_backends(module, url):
 
 
 def auth_present(module, url):
+    """ Make sure the auth backend is present """
     auth_url = url + '/v1/sys/auth/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -130,6 +133,7 @@ def auth_present(module, url):
 
 
 def auth_absent(module, url):
+    """ Make sure the auth backend is absent """
     auth_url = url + '/v1/sys/auth/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 

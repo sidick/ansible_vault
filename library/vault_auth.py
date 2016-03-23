@@ -84,6 +84,7 @@ EXAMPLES = '''
 
 
 def make_vault_url(module, vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -96,7 +97,7 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def vault_auth(module, url):
-
+    """ Authenticate against Vault and return the token """
     auth_methods = {
         'github':   ['token'],
         'ldap':     ['username', 'password'],
