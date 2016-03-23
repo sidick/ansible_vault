@@ -162,23 +162,6 @@ def token_present(module, url):
     module.exit_json(changed=True, **ret['auth'])
 
 
-def token_absent(module, url):
-    token_url = url + '/v1/sys/auth/' + module.params['mountpoint']
-    headers = {"X-Vault-Token": module.params['token']}
-
-    token_list = get_auth_backends(module, url)
-
-    if module.params['mountpoint']+'/' not in auth_list:
-        module.exit_json(change=False)
-
-    response, info = fetch_url(module, auth_url, method='DELETE', headers=headers)
-
-    if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to disable auth backend '%s' (%s)" % (module.params['mountpoint'], info['msg']))
-
-    module.exit_json(changed=True)
-
-
 def main():
 
     module = AnsibleModule(
@@ -210,8 +193,6 @@ def main():
 
     if state == 'present':
         token_present(module, url)
-    if state == 'absent':
-        token_absent(module, url)
 
 
 
