@@ -74,6 +74,7 @@ EXAMPLES = '''
 
 
 def make_vault_url(module, vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -86,6 +87,7 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def vault_seal(module, url, token):
+    """ Seal the Vault """
     seal_url = url + '/v1/sys/seal'
     headers = {"X-Vault-Token": token}
 
@@ -100,7 +102,8 @@ def vault_seal(module, url, token):
     module.exit_json(changed=True)
 
 
-def vault_unseal(module, url, token, key):
+def vault_unseal(module, url, key):
+    """ Apply an unseal key to the Vault """
     unseal_url = url + '/v1/sys/unseal'
     data = json.dumps({'key': key})
 
@@ -118,6 +121,7 @@ def vault_unseal(module, url, token, key):
 
 
 def vault_seal_status(module, url):
+    """ Return the status of the Vault """
     seal_url = url + '/v1/sys/seal-status'
 
     response, info = fetch_url(module, seal_url, method='GET')
@@ -129,6 +133,7 @@ def vault_seal_status(module, url):
 
 
 def vault_reset(module, url, token):
+    """ Reset the Vault unseal process """
     reset_url = url + '/v1/sys/unseal'
     headers = {"X-Vault-Token": token}
     data = json.dumps({'reset': True})
@@ -179,7 +184,7 @@ def main():
             module.exit_json(changed=False)
     if state == 'unsealed':
         if seal_state['sealed']:
-            vault_unseal(module, url, token, key)
+            vault_unseal(module, url, key)
         else:
             module.exit_json(changed=False)
     if state == 'reset':

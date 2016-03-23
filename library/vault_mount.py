@@ -107,6 +107,7 @@ EXAMPLES = '''
 
 
 def make_vault_url(module, vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -119,6 +120,7 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def get_mounts(module, url):
+    """ Get the list of secret mounts """
     mount_url = url + '/v1/sys/mounts'
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -131,6 +133,7 @@ def get_mounts(module, url):
 
 
 def mount_present(module, url):
+    """ Make sure a secret mount is mounted """
     mount_url = url + '/v1/sys/mounts/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -159,6 +162,7 @@ def mount_present(module, url):
 
 
 def mount_absent(module, url):
+    """ Make sure a secret mount is not mounted """
     mount_url = url + '/v1/sys/mounts/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -176,6 +180,7 @@ def mount_absent(module, url):
 
 
 def mount_remount(module, url):
+    """ Change the mountpoint of a secret mount """
     mount_url = url + '/v1/sys/remount'
     headers = {"X-Vault-Token": module.params['token']}
 

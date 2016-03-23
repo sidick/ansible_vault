@@ -51,6 +51,7 @@ EXAMPLES = '''
 
 
 def make_vault_url(module, vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -63,6 +64,7 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def vault_seal_status(module, url):
+    """ Return the Vault seal status """
     seal_url = url + '/v1/sys/seal-status'
 
     response, info = fetch_url(module, seal_url, method='GET')
@@ -74,6 +76,7 @@ def vault_seal_status(module, url):
 
 
 def get_list(module, url, type):
+    """ Get the list of objects at a particular url """
     api_url = url + '/v1/sys/' + type
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -86,6 +89,7 @@ def get_list(module, url, type):
 
 
 def vault_leader_status(module, url):
+    """ Get the Vault leader status """
     seal_url = url + '/v1/sys/leader'
 
     response, info = fetch_url(module, seal_url, method='GET')
@@ -97,6 +101,7 @@ def vault_leader_status(module, url):
 
 
 def vault_facts(module, url):
+    """ Combine all the Vault facts and return the data """
     results1 = vault_seal_status(module, url)
     results2 = vault_leader_status(module, url)
 

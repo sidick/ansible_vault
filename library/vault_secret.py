@@ -78,6 +78,7 @@ EXAMPLES = '''
 
 
 def make_vault_url(module, vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -90,6 +91,7 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def vault_secret_exist(module, url, token, secret):
+    """ Check if a secret exists """
     secret_url = url + '/v1/' + secret
     headers = {"X-Vault-Token": token}
 
@@ -101,6 +103,7 @@ def vault_secret_exist(module, url, token, secret):
 
 
 def vault_set(module, url, token, secret, key):
+    """ Set a Vault secret """
     secret_url = url + '/v1/' + secret
     headers = {"X-Vault-Token": token}
 
@@ -113,6 +116,7 @@ def vault_set(module, url, token, secret, key):
 
 
 def vault_remove(module, url, token, secret):
+    """ Delete a secret """
     secret_url = url + '/v1/' + secret
     headers = {"X-Vault-Token": token}
 

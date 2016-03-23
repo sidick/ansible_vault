@@ -74,6 +74,7 @@ EXAMPLES = '''
 
 
 def make_vault_url(module, vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -86,6 +87,7 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def get_policies(module, url):
+    """ Get the list of policies that are setup """
     policy_url = url + '/v1/sys/policy'
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -98,6 +100,7 @@ def get_policies(module, url):
 
 
 def policy_present(module, url):
+    """ Ensure a policy is present """
     policy_url = url + '/v1/sys/policy/' + module.params['policy_name']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -115,6 +118,7 @@ def policy_present(module, url):
 
 
 def policy_absent(module, url):
+    """ Ensure a policy is absent """
     policy_url = url + '/v1/sys/policy/' + module.params['policy_name']
     headers = {"X-Vault-Token": module.params['token']}
 
