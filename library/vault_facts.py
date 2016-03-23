@@ -50,7 +50,8 @@ EXAMPLES = '''
 '''
 
 
-def make_vault_url(module, vault_server, vault_port, vault_tls):
+def make_vault_url(vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -63,6 +64,7 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def vault_seal_status(module, url):
+    """ Return the Vault seal status """
     seal_url = url + '/v1/sys/seal-status'
 
     response, info = fetch_url(module, seal_url, method='GET')
@@ -70,22 +72,24 @@ def vault_seal_status(module, url):
     if info['status'] == 200:
         return json.loads(response.read())
 
-    module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
+    module.fail_json(msg="Failed to get vault status ({0!s})".format(info['msg']))
 
 
 def get_list(module, url, type):
+    """ Get the list of objects at a particular url """
     api_url = url + '/v1/sys/' + type
     headers = {"X-Vault-Token": module.params['token']}
 
     response, info = fetch_url(module, api_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch %s list (%s)" % (type, info['msg']))
+        module.fail_json(msg="Unable to fetch {0!s} list ({1!s})".format(type, info['msg']))
 
     return json.loads(response.read())
 
 
 def vault_leader_status(module, url):
+    """ Get the Vault leader status """
     seal_url = url + '/v1/sys/leader'
 
     response, info = fetch_url(module, seal_url, method='GET')
@@ -93,10 +97,11 @@ def vault_leader_status(module, url):
     if info['status'] == 200:
         return json.loads(response.read())
 
-    module.fail_json(msg="Failed to get vault leader status (%s)" % info['msg'])
+    module.fail_json(msg="Failed to get vault leader status ({0!s})".format(info['msg']))
 
 
 def vault_facts(module, url):
+    """ Combine all the Vault facts and return the data """
     results1 = vault_seal_status(module, url)
     results2 = vault_leader_status(module, url)
 
@@ -129,7 +134,7 @@ def main():
     vault_server = module.params['server']
     vault_tls = module.params['tls']
 
-    url = make_vault_url(module, vault_server, vault_port, vault_tls)
+    url = make_vault_url(vault_server, vault_port, vault_tls)
 
     vault_facts(module, url)
 

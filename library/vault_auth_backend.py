@@ -82,7 +82,8 @@ EXAMPLES = '''
 '''
 
 
-def make_vault_url(module, vault_server, vault_port, vault_tls):
+def make_vault_url(vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -95,18 +96,20 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def get_auth_backends(module, url):
+    """ Get the list of auth backends """
     auth_url = url + '/v1/sys/auth'
     headers = {"X-Vault-Token": module.params['token']}
 
     response, info = fetch_url(module, auth_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch auth backend list (%s)" % info['msg'])
+        module.fail_json(msg="Unable to fetch auth backend list ({0!s})".format(info['msg']))
 
     return json.loads(response.read())
 
 
 def auth_present(module, url):
+    """ Make sure the auth backend is present """
     auth_url = url + '/v1/sys/auth/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -124,12 +127,13 @@ def auth_present(module, url):
     response, info = fetch_url(module, auth_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to enable auth backend '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to enable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True, **data)
 
 
 def auth_absent(module, url):
+    """ Make sure the auth backend is absent """
     auth_url = url + '/v1/sys/auth/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -141,7 +145,7 @@ def auth_absent(module, url):
     response, info = fetch_url(module, auth_url, method='DELETE', headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to disable auth backend '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to disable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True)
 
@@ -169,7 +173,7 @@ def main():
     vault_server = module.params['server']
     vault_tls = module.params['tls']
 
-    url = make_vault_url(module, vault_server, vault_port, vault_tls)
+    url = make_vault_url(vault_server, vault_port, vault_tls)
 
     if state == 'present':
         auth_present(module, url)
