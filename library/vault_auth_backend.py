@@ -101,7 +101,7 @@ def get_auth_backends(module, url):
     response, info = fetch_url(module, auth_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch auth backend list (%s)" % info['msg'])
+        module.fail_json(msg="Unable to fetch auth backend list ({0!s})".format(info['msg']))
 
     return json.loads(response.read())
 
@@ -124,7 +124,7 @@ def auth_present(module, url):
     response, info = fetch_url(module, auth_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to enable auth backend '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to enable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True, **data)
 
@@ -141,7 +141,7 @@ def auth_absent(module, url):
     response, info = fetch_url(module, auth_url, method='DELETE', headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to disable auth backend '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to disable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True)
 
