@@ -73,7 +73,7 @@ EXAMPLES = '''
 '''
 
 
-def make_vault_url(module, vault_server, vault_port, vault_tls):
+def make_vault_url(vault_server, vault_port, vault_tls):
     """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
@@ -157,7 +157,7 @@ def main():
     vault_server = module.params['server']
     vault_tls = module.params['tls']
 
-    url = make_vault_url(module, vault_server, vault_port, vault_tls)
+    url = make_vault_url(vault_server, vault_port, vault_tls)
 
     if state == 'present':
         policy_present(module, url)
