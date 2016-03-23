@@ -147,7 +147,7 @@ def token_present(module, url):
 
         # If token already exists return unchanged
         if token_details:
-            module.exit_json(change=False, **token_details['data'])
+            module.exit_json(changed=False, **token_details['data'])
 
     data_json = json.dumps(data)
     #module.fail_json(msg="%s" % data_json)
