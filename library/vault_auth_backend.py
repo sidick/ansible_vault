@@ -177,7 +177,6 @@ def main():
         auth_absent(module, url)
 
 
-
 from ansible.module_utils.basic import *
 from ansible.module_utils.urls import *
 

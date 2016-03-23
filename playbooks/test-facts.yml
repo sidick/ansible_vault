@@ -13,10 +13,19 @@
     - name: Gather facts
       vault_facts: tls=off
       register: vault_facts
-    
+
     - name: show fact list
       debug: var=vault_facts
 
     - name: Message if the vault is sealed
       debug: msg="This vault is not sealed"
       when: vault_facts.sealed is defined and vault_facts.sealed != True
+
+    - name: Gather facts (authenticated)
+      vault_facts:
+        tls: off
+        token: "{{ vault_token }}"
+      register: vault_facts_auth
+
+    - name: show fact list (authenticated)
+      debug: var=vault_facts_auth

@@ -99,6 +99,7 @@ def vault_auth(module, url):
 
     auth_methods = {
         'github':   ['token'],
+        'ldap':     ['username', 'password'],
         'userpass': ['username', 'password']
     }
 
@@ -132,6 +133,7 @@ def vault_auth(module, url):
 
     ret = json.loads(response.read())
     module.exit_json(changed=True, **ret['auth'])
+
 
 def main():
 

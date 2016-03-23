@@ -62,7 +62,6 @@ EXAMPLES = '''
 # Unseal the vault
 
 - vault_seal:
-    token: XXXXXXXX
     state: unsealed
     key: XXXXXX
 
@@ -103,13 +102,12 @@ def vault_seal(module, url, token):
 
 def vault_unseal(module, url, token, key):
     unseal_url = url + '/v1/sys/unseal'
-    headers = {"X-Vault-Token": token}
     data = json.dumps({'key': key})
 
     if module.check_mode:
         module.exit_json(changed=True)
 
-    response, info = fetch_url(module, unseal_url, method='POST', headers=headers, data=data)
+    response, info = fetch_url(module, unseal_url, method='POST', data=data)
 
     if info['status'] != 200 and info['status'] != 204:
         module.fail_json(msg="Unable to unseal vault (%s)" % info['msg'])
@@ -153,7 +151,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(required=True, choices=['sealed', 'unsealed', 'reset']),
-            token=dict(required=True, default=None, type='str'),
+            token=dict(required=False, default=None, type='str'),
             key=dict(required=False, default=None, type='str'),
             server=dict(required=False, default='localhost', type='str'),
             port=dict(required=False, default=8200, type='int'),
