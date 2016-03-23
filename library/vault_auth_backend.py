@@ -78,7 +78,6 @@ EXAMPLES = '''
     token: XXXXXXXX
     mountpoint: app-id
     state: absent
-    type: app-id
 
 '''
 
@@ -176,7 +175,6 @@ def main():
         auth_present(module, url)
     if state == 'absent':
         auth_absent(module, url)
-
 
 
 from ansible.module_utils.basic import *

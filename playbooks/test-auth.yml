@@ -1,0 +1,64 @@
+---
+
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: False
+  become: False
+  vars_files:
+    - ../group_vars/vault
+
+  tasks:
+    - include: test-vault-credentials.yml
+
+    - name: Enable authentication backend
+      vault_auth_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'userpass'
+        tls: off
+        state: present
+        type: userpass
+        description: 'userpass backend'
+
+    - name: Create user/pass
+      vault_secret:
+        token: "{{ vault_token }}"
+        tls: off
+        state: present
+        secret: 'auth/userpass/users/authtest'
+        key:
+          password: reallybadpassword
+          policies: root
+
+    - name: Login using userpass
+      vault_auth:
+        tls: off
+        method: userpass
+        auth:
+          username: authtest
+          password: reallybadpassword
+      register: login
+
+    - name: Create secret
+      vault_secret:
+        token: "{{ login.client_token }}"
+        tls: off
+        state: present
+        secret: 'secret/logintest1'
+        key:
+          user: username1
+          pass: password1
+
+    - name: Remove secret
+      vault_secret:
+        token: "{{ login.client_token }}"
+        tls: off
+        state: absent
+        secret: 'secret/logintest1'
+
+    - name: Disable userpass authentication backend
+      vault_auth_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'userpass'
+        type: userpass
+        tls: off
+        state: absent

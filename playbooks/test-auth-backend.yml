@@ -32,7 +32,6 @@
       vault_auth_backend:
         token: "{{ vault_token }}"
         mountpoint: 'authtest'
-        type: app-id
         tls: off
         state: absent
 
@@ -40,6 +39,5 @@
       vault_auth_backend:
         token: "{{ vault_token }}"
         mountpoint: 'authtest'
-        type: app-id
         tls: off
         state: absent

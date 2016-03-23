@@ -186,8 +186,6 @@ def mount_remount(module, url):
 
     data_json = json.dumps(data)
 
-    #module.fail_json(msg="Unknown", **data)
-
     mount_list = get_mounts(module, url)
 
     if module.params['mountpoint']+'/' not in mount_list:
@@ -238,7 +236,6 @@ def main():
         mount_absent(module, url)
     if state == 'remount':
         mount_remount(module, url)
-
 
 
 from ansible.module_utils.basic import *
