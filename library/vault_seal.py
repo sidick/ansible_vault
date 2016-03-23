@@ -100,7 +100,7 @@ def vault_seal(module, url, token):
     module.exit_json(changed=True)
 
 
-def vault_unseal(module, url, token, key):
+def vault_unseal(module, url, key):
     unseal_url = url + '/v1/sys/unseal'
     data = json.dumps({'key': key})
 
@@ -179,7 +179,7 @@ def main():
             module.exit_json(changed=False)
     if state == 'unsealed':
         if seal_state['sealed']:
-            vault_unseal(module, url, token, key)
+            vault_unseal(module, url, key)
         else:
             module.exit_json(changed=False)
     if state == 'reset':
