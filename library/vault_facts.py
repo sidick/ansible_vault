@@ -70,7 +70,7 @@ def vault_seal_status(module, url):
     if info['status'] == 200:
         return json.loads(response.read())
 
-    module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
+    module.fail_json(msg="Failed to get vault status ({0!s})".format(info['msg']))
 
 
 def get_list(module, url, type):
@@ -80,7 +80,7 @@ def get_list(module, url, type):
     response, info = fetch_url(module, api_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch %s list (%s)" % (type, info['msg']))
+        module.fail_json(msg="Unable to fetch {0!s} list ({1!s})".format(type, info['msg']))
 
     return json.loads(response.read())
 
@@ -93,7 +93,7 @@ def vault_leader_status(module, url):
     if info['status'] == 200:
         return json.loads(response.read())
 
-    module.fail_json(msg="Failed to get vault leader status (%s)" % info['msg'])
+    module.fail_json(msg="Failed to get vault leader status ({0!s})".format(info['msg']))
 
 
 def vault_facts(module, url):

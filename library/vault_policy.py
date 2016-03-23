@@ -92,7 +92,7 @@ def get_policies(module, url):
     response, info = fetch_url(module, policy_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch policy list (%s)" % info['msg'])
+        module.fail_json(msg="Unable to fetch policy list ({0!s})".format(info['msg']))
 
     return json.loads(response.read())
 
@@ -109,7 +109,7 @@ def policy_present(module, url):
     response, info = fetch_url(module, policy_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to create policy '%s' (%s)" % (module.params['policy'], info['msg']))
+        module.fail_json(msg="Unable to create policy '{0!s}' ({1!s})".format(module.params['policy'], info['msg']))
 
     module.exit_json(changed=True)
 
@@ -126,7 +126,7 @@ def policy_absent(module, url):
     response, info = fetch_url(module, policy_url, method='DELETE', headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to remove policy '%s' (%s)" % (module.params['policy'], info['msg']))
+        module.fail_json(msg="Unable to remove policy '{0!s}' ({1!s})".format(module.params['policy'], info['msg']))
 
     module.exit_json(changed=True)
 

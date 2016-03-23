@@ -110,7 +110,7 @@ def vault_unseal(module, url, token, key):
     response, info = fetch_url(module, unseal_url, method='POST', data=data)
 
     if info['status'] != 200 and info['status'] != 204:
-        module.fail_json(msg="Unable to unseal vault (%s)" % info['msg'])
+        module.fail_json(msg="Unable to unseal vault ({0!s})".format(info['msg']))
 
     result = json.loads(response.read())
 
@@ -125,7 +125,7 @@ def vault_seal_status(module, url):
     if info['status'] == 200:
         return json.loads(response.read())
 
-    module.fail_json(msg="Failed to get vault status (%s)" % info['msg'])
+    module.fail_json(msg="Failed to get vault status ({0!s})".format(info['msg']))
 
 
 def vault_reset(module, url, token):
@@ -139,7 +139,7 @@ def vault_reset(module, url, token):
     response, info = fetch_url(module, reset_url, method='POST', headers=headers, data=data)
 
     if info['status'] != 200 and info['status'] != 204:
-        module.fail_json(msg="Unable to reset vault unseal (%s)" % info['msg'])
+        module.fail_json(msg="Unable to reset vault unseal ({0!s})".format(info['msg']))
 
     result = json.loads(response.read())
 

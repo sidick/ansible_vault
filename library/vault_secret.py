@@ -107,7 +107,7 @@ def vault_set(module, url, token, secret, key):
     response, info = fetch_url(module, secret_url, method='POST', headers=headers, data=json.dumps(key))
 
     if info['status'] != 200 and info['status'] != 204:
-        module.fail_json(msg="Failed to write secret (%s)" % info['msg'])
+        module.fail_json(msg="Failed to write secret ({0!s})".format(info['msg']))
 
     module.exit_json(changed=True)
 
@@ -119,7 +119,7 @@ def vault_remove(module, url, token, secret):
     response, info = fetch_url(module, secret_url, method='DELETE', headers=headers)
 
     if info['status'] != 200 and info['status'] != 204:
-        module.fail_json(msg="Failed to remove secret (%s)" % info['msg'])
+        module.fail_json(msg="Failed to remove secret ({0!s})".format(info['msg']))
 
     module.exit_json(changed=True)
 
@@ -159,7 +159,7 @@ def main():
         else:
             return module.exit_json(changed=False)
 
-    return module.fail_json(msg="Unknown usage absent = %s" % state)
+    return module.fail_json(msg="Unknown usage absent = {0!s}".format(state))
 
 
 from ansible.module_utils.basic import *

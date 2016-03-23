@@ -113,7 +113,7 @@ def vault_auth(module, url):
     if method in auth_methods:
         for param in auth_methods[method]:
             if param not in auth:
-                module.fail_json(msg="%s is required for the %s method" % (param, method))
+                module.fail_json(msg="{0!s} is required for the {1!s} method".format(param, method))
 
         data = auth
         auth_url = auth_url + 'auth/' + method + '/login'
@@ -129,7 +129,7 @@ def vault_auth(module, url):
     response, info = fetch_url(module, auth_url, method='POST', data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to authenticate (%s)" % info['msg'])
+        module.fail_json(msg="Unable to authenticate ({0!s})".format(info['msg']))
 
     ret = json.loads(response.read())
     module.exit_json(changed=True, **ret['auth'])
@@ -158,7 +158,7 @@ def main():
 
     vault_auth(module, url)
 
-    return module.fail_json(msg="Unknown usage absent = %s" % state)
+    return module.fail_json(msg="Unknown usage absent = {0!s}".format(state))
 
 
 from ansible.module_utils.basic import *
