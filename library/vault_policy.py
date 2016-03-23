@@ -73,7 +73,8 @@ EXAMPLES = '''
 '''
 
 
-def make_vault_url(module, vault_server, vault_port, vault_tls):
+def make_vault_url(vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -86,18 +87,20 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def get_policies(module, url):
+    """ Get the list of policies that are setup """
     policy_url = url + '/v1/sys/policy'
     headers = {"X-Vault-Token": module.params['token']}
 
     response, info = fetch_url(module, policy_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch policy list (%s)" % info['msg'])
+        module.fail_json(msg="Unable to fetch policy list ({0!s})".format(info['msg']))
 
     return json.loads(response.read())
 
 
 def policy_present(module, url):
+    """ Ensure a policy is present """
     policy_url = url + '/v1/sys/policy/' + module.params['policy_name']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -109,12 +112,13 @@ def policy_present(module, url):
     response, info = fetch_url(module, policy_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to create policy '%s' (%s)" % (module.params['policy'], info['msg']))
+        module.fail_json(msg="Unable to create policy '{0!s}' ({1!s})".format(module.params['policy'], info['msg']))
 
     module.exit_json(changed=True)
 
 
 def policy_absent(module, url):
+    """ Ensure a policy is absent """
     policy_url = url + '/v1/sys/policy/' + module.params['policy_name']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -126,7 +130,7 @@ def policy_absent(module, url):
     response, info = fetch_url(module, policy_url, method='DELETE', headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to remove policy '%s' (%s)" % (module.params['policy'], info['msg']))
+        module.fail_json(msg="Unable to remove policy '{0!s}' ({1!s})".format(module.params['policy'], info['msg']))
 
     module.exit_json(changed=True)
 
@@ -153,7 +157,7 @@ def main():
     vault_server = module.params['server']
     vault_tls = module.params['tls']
 
-    url = make_vault_url(module, vault_server, vault_port, vault_tls)
+    url = make_vault_url(vault_server, vault_port, vault_tls)
 
     if state == 'present':
         policy_present(module, url)

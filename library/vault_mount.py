@@ -106,7 +106,8 @@ EXAMPLES = '''
 '''
 
 
-def make_vault_url(module, vault_server, vault_port, vault_tls):
+def make_vault_url(vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -119,18 +120,20 @@ def make_vault_url(module, vault_server, vault_port, vault_tls):
 
 
 def get_mounts(module, url):
+    """ Get the list of secret mounts """
     mount_url = url + '/v1/sys/mounts'
     headers = {"X-Vault-Token": module.params['token']}
 
     response, info = fetch_url(module, mount_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch mount list (%s)" % info['msg'])
+        module.fail_json(msg="Unable to fetch mount list ({0!s})".format(info['msg']))
 
     return json.loads(response.read())
 
 
 def mount_present(module, url):
+    """ Make sure a secret mount is mounted """
     mount_url = url + '/v1/sys/mounts/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -153,12 +156,13 @@ def mount_present(module, url):
     response, info = fetch_url(module, mount_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to mount '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to mount '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True, **data)
 
 
 def mount_absent(module, url):
+    """ Make sure a secret mount is not mounted """
     mount_url = url + '/v1/sys/mounts/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -170,12 +174,13 @@ def mount_absent(module, url):
     response, info = fetch_url(module, mount_url, method='DELETE', headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to unmount '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to unmount '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True)
 
 
 def mount_remount(module, url):
+    """ Change the mountpoint of a secret mount """
     mount_url = url + '/v1/sys/remount'
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -189,15 +194,15 @@ def mount_remount(module, url):
     mount_list = get_mounts(module, url)
 
     if module.params['mountpoint']+'/' not in mount_list:
-        module.fail_json(msg="Mountpoint '%s' not available to remount" % module.params['mountpoint'])
+        module.fail_json(msg="Mountpoint '{0!s}' not available to remount".format(module.params['mountpoint']))
 
     if module.params['new_mountpoint']+'/' in mount_list:
-        module.fail_json(msg="New mountpoint already exists: %s" % module.params['new_mountpoint'])
+        module.fail_json(msg="New mountpoint already exists: {0!s}".format(module.params['new_mountpoint']))
 
     response, info = fetch_url(module, mount_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to remount '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to remount '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True, msg="blah", **data)
 
@@ -228,7 +233,7 @@ def main():
     vault_server = module.params['server']
     vault_tls = module.params['tls']
 
-    url = make_vault_url(module, vault_server, vault_port, vault_tls)
+    url = make_vault_url(vault_server, vault_port, vault_tls)
 
     if state == 'present':
         mount_present(module, url)
