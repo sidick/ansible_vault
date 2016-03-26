@@ -11,6 +11,7 @@ with [Ansible] and [Vault]
 
 Currently the modules available include:
 
+* vault_audit_backend
 * vault_auth
 * vault_auth_backend
 * vault_facts
