@@ -129,6 +129,7 @@ def vault_remove(module, url, token, secret):
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(

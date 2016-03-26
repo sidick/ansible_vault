@@ -117,6 +117,7 @@ def vault_facts(module, url):
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(

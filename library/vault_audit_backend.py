@@ -120,7 +120,7 @@ def get_audit_backends(module, url):
     response, info = fetch_url(module, auth_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch audit backend list (%s)" % info['msg'])
+        module.fail_json(msg="Failed to fetch audit backend list ({0!s})".format(info['msg']))
 
     return json.loads(response.read())
 
@@ -138,11 +138,11 @@ def audit_present(module, url):
 
     type = module.params['type']
     if type not in audit:
-        module.fail_json(msg="Unsupported audit backend: %s" % type)
+        module.fail_json(msg="Unsupported audit backend: {0!s}".format(type))
 
     for required in audit[type]:
         if not module.params[required]:
-            module.fail_json(msg="%s is required for %s audit backend" % (required, type))
+            module.fail_json(msg="{0!s} is required for {1!s} audit backend".format(required, type))
 
     options = {}
     data = {
@@ -171,7 +171,7 @@ def audit_present(module, url):
     response, info = fetch_url(module, audit_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to enable auth backend '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to enable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True, **data)
 
@@ -190,12 +190,13 @@ def audit_absent(module, url):
     response, info = fetch_url(module, audit_url, method='DELETE', headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to disable audit backend '%s' (%s)" % (module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to disable audit backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True)
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
