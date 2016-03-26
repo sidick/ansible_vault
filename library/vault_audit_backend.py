@@ -43,12 +43,12 @@ options:
     default: null
   log_raw:
     description:
-      - Logs the security sensitive information without hashing, in the raw format with the file audit backend
+      - Logs the security sensitive information without hashing, in the raw format
     require: false
     default: false
   hmac_accessor:
     description:
-      - Skips the hashing of token accessor. This option is useful only when log_raw is false and is only valid with the file audit backend
+      - Skips the hashing of token accessor. This option is useful only when log_raw is false
     require: false
     default: false
   server:
@@ -153,8 +153,13 @@ def audit_present(module, url):
 
     if type == 'file':
         options['path'] = module.params['file_path']
-        options['log_raw'] = str(module.params['log_raw'])
-        options['hmac_accessor'] = str(module.params['hmac_accessor'])
+
+    if type == 'syslog':
+        options['tag'] = module.params['tag']
+        options['facility'] = module.params['facility']
+
+    options['log_raw'] = str(module.params['log_raw'])
+    options['hmac_accessor'] = str(module.params['hmac_accessor'])
 
     data_json = json.dumps(data)
 
@@ -199,6 +204,8 @@ def main():
             mountpoint=dict(required=True, default=None, type='str'),
             type=dict(required=False, default=None, type='str'),
             file_path=dict(required=False, default=None, type='str'),
+            facility=dict(required=False, default='AUTH', type='str'),
+            tag=dict(required=False, default='vault', type='str'),
             log_raw=dict(required=False, default=False, type='bool'),
             hmac_accessor=dict(required=False, default=False, type='bool'),
             description=dict(required=False, default='', type='str'),

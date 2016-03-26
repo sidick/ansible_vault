@@ -10,7 +10,7 @@
   tasks:
     - include: test-vault-credentials.yml
 
-    - name: Enable audit backend
+    - name: Enable file audit backend
       vault_audit_backend:
         token: "{{ vault_token }}"
         mountpoint: 'audittest'
@@ -20,7 +20,7 @@
         file_path: '/tmp/vault_audit.log'
         description: 'Generic file audit backend'
 
-    - name: Enable audit backend (should show no changes)
+    - name: Enable file audit backend (should show no changes)
       vault_audit_backend:
         token: "{{ vault_token }}"
         mountpoint: 'audittest'
@@ -30,16 +30,43 @@
         file_path: '/tmp/vault_audit.log'
         description: 'Generic file audit backend'
 
-    - name: Disable audit backend
+    - name: Disable file audit backend
       vault_audit_backend:
         token: "{{ vault_token }}"
         mountpoint: 'audittest'
         tls: off
         state: absent
 
-    - name: Disable audit backend (should show no changes)
+    - name: Disable file audit backend (should show no changes)
       vault_audit_backend:
         token: "{{ vault_token }}"
         mountpoint: 'audittest'
+        tls: off
+        state: absent
+
+    - name: Enable syslog audit backend
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest2'
+        tls: off
+        state: present
+        type: syslog
+        tag: 'vaulttest'
+        description: 'Generic syslog audit backend'
+
+    - name: Enable syslog audit backend (should show no changes)
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest2'
+        tls: off
+        state: present
+        type: syslog
+        tag: 'vaulttest'
+        description: 'Generic syslog audit backend'
+
+    - name: Disable syslog audit backend
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest2'
         tls: off
         state: absent
