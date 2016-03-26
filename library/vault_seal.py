@@ -152,6 +152,7 @@ def vault_reset(module, url, token):
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
