@@ -136,6 +136,7 @@ def policy_absent(module, url):
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(

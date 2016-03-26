@@ -6,5 +6,6 @@
 - include: playbooks/test-secrets.yml
 - include: playbooks/test-mounts.yml
 - include: playbooks/test-auth-backend.yml
+- include: playbooks/test-audit-backend.yml
 - include: playbooks/test-policy.yml
 - include: playbooks/test-auth.yml

@@ -4,10 +4,10 @@ import json
 
 DOCUMENTATION = '''
 ---
-module: vault_auth_backend
-short_description: Manage Vault Authentication Backends
+module: vault_audit_backend
+short_description: Manage Vault Audit Backends
 description:
-  - Add and Remove Vault authentication backends
+  - Add and Remove Vault Audit backends
 options:
   token:
     description:
@@ -36,6 +36,21 @@ options:
       - Sets a human-friendly description of the mount
     require: false
     default: ''
+  file_path:
+    description:
+      - Sets the path to write the log to with the file audit backend
+    require: false
+    default: null
+  log_raw:
+    description:
+      - Logs the security sensitive information without hashing, in the raw format
+    require: false
+    default: false
+  hmac_accessor:
+    description:
+      - Skips the hashing of token accessor. This option is useful only when log_raw is false
+    require: false
+    default: false
   server:
     description:
       - Hostname used to connect to the Vault server
@@ -63,9 +78,9 @@ options:
 '''
 
 EXAMPLES = '''
-# Enable a new auth backend
+# Enable a new audit backend
 
-- vault_auth_backend:
+- vault_audit_backend:
     token: XXXXXXXX
     state: present
     mountpoint: app-id
@@ -74,7 +89,7 @@ EXAMPLES = '''
 
 # Disable an auth backend
 
-- vault_auth_backend:
+- vault_audit_backend:
     token: XXXXXXXX
     mountpoint: app-id
     state: absent
@@ -84,6 +99,7 @@ EXAMPLES = '''
 
 def make_vault_url(vault_server, vault_port, vault_tls):
     """ Create base Vault URL """
+
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -95,36 +111,64 @@ def make_vault_url(vault_server, vault_port, vault_tls):
     return vault_url
 
 
-def get_auth_backends(module, url):
-    """ Get the list of auth backends """
-    auth_url = url + '/v1/sys/auth'
+def get_audit_backends(module, url):
+    """ Fetch a list of audit backends which are enabled """
+
+    auth_url = url + '/v1/sys/audit'
     headers = {"X-Vault-Token": module.params['token']}
 
     response, info = fetch_url(module, auth_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch auth backend list ({0!s})".format(info['msg']))
+        module.fail_json(msg="Failed to fetch audit backend list ({0!s})".format(info['msg']))
 
     return json.loads(response.read())
 
 
-def auth_present(module, url):
-    """ Make sure the auth backend is present """
-    auth_url = url + '/v1/sys/auth/' + module.params['mountpoint']
+def audit_present(module, url):
+    """ Ensure audit backend is present """
+
+    audit_url = url + '/v1/sys/audit/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 
-    data = {
-        'type': module.params['type'],
-        'description': module.params['description'],
+    audit = {
+        'file': ['file_path'],
+        'syslog': [],
     }
+
+    type = module.params['type']
+    if type not in audit:
+        module.fail_json(msg="Unsupported audit backend: {0!s}".format(type))
+
+    for required in audit[type]:
+        if not module.params[required]:
+            module.fail_json(msg="{0!s} is required for {1!s} audit backend".format(required, type))
+
+    options = {}
+    data = {
+        'type': type,
+        'description': module.params['description'],
+        'options': options
+    }
+
+    if type == 'file':
+        options['path'] = module.params['file_path']
+
+    if type == 'syslog':
+        options['tag'] = module.params['tag']
+        options['facility'] = module.params['facility']
+
+    options['log_raw'] = str(module.params['log_raw'])
+    options['hmac_accessor'] = str(module.params['hmac_accessor'])
+
     data_json = json.dumps(data)
 
-    auth_list = get_auth_backends(module, url)
+    audit_list = get_audit_backends(module, url)
 
-    if module.params['mountpoint']+'/' in auth_list:
+    if module.params['mountpoint']+'/' in audit_list:
         module.exit_json(changed=False, **data)
 
-    response, info = fetch_url(module, auth_url, method='POST', headers=headers, data=data_json)
+    response, info = fetch_url(module, audit_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
         module.fail_json(msg="Unable to enable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
@@ -132,20 +176,21 @@ def auth_present(module, url):
     module.exit_json(changed=True, **data)
 
 
-def auth_absent(module, url):
-    """ Make sure the auth backend is absent """
-    auth_url = url + '/v1/sys/auth/' + module.params['mountpoint']
+def audit_absent(module, url):
+    """ Ensure audit backend is absent """
+
+    audit_url = url + '/v1/sys/audit/' + module.params['mountpoint']
     headers = {"X-Vault-Token": module.params['token']}
 
-    auth_list = get_auth_backends(module, url)
+    audit_list = get_audit_backends(module, url)
 
-    if module.params['mountpoint']+'/' not in auth_list:
+    if module.params['mountpoint']+'/' not in audit_list:
         module.exit_json(changed=False)
 
-    response, info = fetch_url(module, auth_url, method='DELETE', headers=headers)
+    response, info = fetch_url(module, audit_url, method='DELETE', headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to disable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
+        module.fail_json(msg="Unable to disable audit backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
 
     module.exit_json(changed=True)
 
@@ -159,6 +204,11 @@ def main():
             state=dict(required=True, choices=['present', 'absent', 'remount']),
             mountpoint=dict(required=True, default=None, type='str'),
             type=dict(required=False, default=None, type='str'),
+            file_path=dict(required=False, default=None, type='str'),
+            facility=dict(required=False, default='AUTH', type='str'),
+            tag=dict(required=False, default='vault', type='str'),
+            log_raw=dict(required=False, default=False, type='bool'),
+            hmac_accessor=dict(required=False, default=False, type='bool'),
             description=dict(required=False, default='', type='str'),
             server=dict(required=False, default='localhost', type='str'),
             port=dict(required=False, default=8200, type='int'),
@@ -177,9 +227,10 @@ def main():
     url = make_vault_url(vault_server, vault_port, vault_tls)
 
     if state == 'present':
-        auth_present(module, url)
+        audit_present(module, url)
     if state == 'absent':
-        auth_absent(module, url)
+        audit_absent(module, url)
+
 
 
 from ansible.module_utils.basic import *
