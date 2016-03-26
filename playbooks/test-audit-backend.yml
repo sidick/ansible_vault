@@ -6,6 +6,8 @@
   become: False
   vars_files:
     - ../group_vars/vault
+  vars:
+    travis: "{{ lookup('env', 'TRAVIS') }}"
 
   tasks:
     - include: test-vault-credentials.yml
@@ -53,6 +55,7 @@
         type: syslog
         tag: 'vaulttest'
         description: 'Generic syslog audit backend'
+      when: travis != 'true'
 
     - name: Enable syslog audit backend (should show no changes)
       vault_audit_backend:
@@ -63,6 +66,7 @@
         type: syslog
         tag: 'vaulttest'
         description: 'Generic syslog audit backend'
+      when: travis != 'true'
 
     - name: Disable syslog audit backend
       vault_audit_backend:
