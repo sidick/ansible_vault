@@ -17,7 +17,7 @@
         tls: off
         state: present
         type: file
-        path: '/tmp/vault_audit.log'
+        file_path: '/tmp/vault_audit.log'
         description: 'Generic file audit backend'
 
     - name: Enable audit backend (should show no changes)
@@ -27,7 +27,7 @@
         tls: off
         state: present
         type: file
-        path: '/tmp/vault_audit.log'
+        file_path: '/tmp/vault_audit.log'
         description: 'Generic file audit backend'
 
     - name: Disable audit backend

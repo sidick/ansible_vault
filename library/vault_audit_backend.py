@@ -36,6 +36,21 @@ options:
       - Sets a human-friendly description of the mount
     require: false
     default: ''
+  file_path:
+    description:
+      - Sets the path to write the log to with the file audit backend
+    require: false
+    default: null
+  log_raw:
+    description:
+      - Logs the security sensitive information without hashing, in the raw format with the file audit backend
+    require: false
+    default: false
+  hmac_accessor:
+    description:
+      - Skips the hashing of token accessor. This option is useful only when log_raw is false and is only valid with the file audit backend
+    require: false
+    default: false
   server:
     description:
       - Hostname used to connect to the Vault server
@@ -117,7 +132,7 @@ def audit_present(module, url):
     headers = {"X-Vault-Token": module.params['token']}
 
     audit = {
-        'file': ['path'],
+        'file': ['file_path'],
         'syslog': [],
     }
 
@@ -130,14 +145,16 @@ def audit_present(module, url):
             module.fail_json(msg="%s is required for %s audit backend" % (required, type))
 
     options = {}
-    if type == 'file':
-        options['path'] = module.params['path']
-
     data = {
         'type': type,
         'description': module.params['description'],
         'options': options
     }
+
+    if type == 'file':
+        options['path'] = module.params['file_path']
+        options['log_raw'] = str(module.params['log_raw'])
+        options['hmac_accessor'] = str(module.params['hmac_accessor'])
 
     data_json = json.dumps(data)
 
@@ -181,7 +198,9 @@ def main():
             state=dict(required=True, choices=['present', 'absent', 'remount']),
             mountpoint=dict(required=True, default=None, type='str'),
             type=dict(required=False, default=None, type='str'),
-            path=dict(required=False, default=None, type='str'),
+            file_path=dict(required=False, default=None, type='str'),
+            log_raw=dict(required=False, default=False, type='bool'),
+            hmac_accessor=dict(required=False, default=False, type='bool'),
             description=dict(required=False, default='', type='str'),
             server=dict(required=False, default='localhost', type='str'),
             port=dict(required=False, default=8200, type='int'),
