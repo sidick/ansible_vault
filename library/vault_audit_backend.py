@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import json
+from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 
 DOCUMENTATION = '''
 ---
@@ -28,7 +30,8 @@ options:
     default: null
   type:
     description:
-      - Sets the type of the mountpoint from the list at https://www.vaultproject.io/docs/auth/index.html
+      - Sets the type of the mountpoint from the list at
+      - https://www.vaultproject.io/docs/auth/index.html
     required: false
     default: null
   description:
@@ -43,12 +46,14 @@ options:
     default: null
   log_raw:
     description:
-      - Logs the security sensitive information without hashing, in the raw format
+      - Logs the security sensitive information without hashing, in
+      - the raw format
     require: false
     default: false
   hmac_accessor:
     description:
-      - Skips the hashing of token accessor. This option is useful only when log_raw is false
+      - Skips the hashing of token accessor. This option is useful only
+      - when log_raw is false
     require: false
     default: false
   server:
@@ -71,7 +76,9 @@ options:
     choices: ['yes', 'no']
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated.
+      - This should only be used on personally controlled sites
+      - using self-signed certificates.
     required: false
     default: 'yes'
     choices: ['yes', 'no']
@@ -120,7 +127,10 @@ def get_audit_backends(module, url):
     response, info = fetch_url(module, auth_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Failed to fetch audit backend list ({0!s})".format(info['msg']))
+        module.fail_json(
+            msg="Failed to fetch audit backend list ({0!s})".format(
+                info['msg'])
+            )
 
     return json.loads(response.read())
 
@@ -142,7 +152,10 @@ def audit_present(module, url):
 
     for required in audit[type]:
         if not module.params[required]:
-            module.fail_json(msg="{0!s} is required for {1!s} audit backend".format(required, type))
+            module.fail_json(
+                msg="{0!s} is required for {1!s} audit backend".format(
+                    required, type)
+                )
 
     options = {}
     data = {
@@ -168,10 +181,17 @@ def audit_present(module, url):
     if module.params['mountpoint']+'/' in audit_list:
         module.exit_json(changed=False, **data)
 
-    response, info = fetch_url(module, audit_url, method='POST', headers=headers, data=data_json)
+    response, info = fetch_url(module,
+                               audit_url,
+                               method='POST',
+                               headers=headers,
+                               data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to enable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
+        module.fail_json(
+            msg="Unable to enable auth backend '{0!s}' ({1!s})".format(
+                module.params['mountpoint'], info['msg'])
+            )
 
     module.exit_json(changed=True, **data)
 
@@ -187,10 +207,16 @@ def audit_absent(module, url):
     if module.params['mountpoint']+'/' not in audit_list:
         module.exit_json(changed=False)
 
-    response, info = fetch_url(module, audit_url, method='DELETE', headers=headers)
+    response, info = fetch_url(module,
+                               audit_url,
+                               method='DELETE',
+                               headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to disable audit backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
+        module.fail_json(
+            msg="Unable to disable audit backend '{0!s}' ({1!s})".format(
+                module.params['mountpoint'], info['msg'])
+            )
 
     module.exit_json(changed=True)
 
@@ -201,7 +227,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, default=None, type='str'),
-            state=dict(required=True, choices=['present', 'absent', 'remount']),
+            state=dict(required=True,
+                       choices=['present', 'absent', 'remount']),
             mountpoint=dict(required=True, default=None, type='str'),
             type=dict(required=False, default=None, type='str'),
             file_path=dict(required=False, default=None, type='str'),
@@ -231,9 +258,5 @@ def main():
     if state == 'absent':
         audit_absent(module, url)
 
-
-
-from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
 
 main()

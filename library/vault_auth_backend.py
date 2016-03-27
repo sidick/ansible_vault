@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
 import json
+from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
+
 
 DOCUMENTATION = '''
 ---
@@ -28,7 +31,8 @@ options:
     default: null
   type:
     description:
-      - Sets the type of the mountpoint from the list at https://www.vaultproject.io/docs/auth/index.html
+      - Sets the type of the mountpoint from the list at
+      - https://www.vaultproject.io/docs/auth/index.html
     required: false
     default: null
   description:
@@ -56,7 +60,8 @@ options:
     choices: ['yes', 'no']
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated. This should only be
+      - used on personally controlled sites using self-signed certificates.
     required: false
     default: 'yes'
     choices: ['yes', 'no']
@@ -103,7 +108,10 @@ def get_auth_backends(module, url):
     response, info = fetch_url(module, auth_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch auth backend list ({0!s})".format(info['msg']))
+        module.fail_json(
+            msg="Unable to fetch auth backend list ({0!s})".format(
+                info['msg'])
+            )
 
     return json.loads(response.read())
 
@@ -124,10 +132,17 @@ def auth_present(module, url):
     if module.params['mountpoint']+'/' in auth_list:
         module.exit_json(changed=False, **data)
 
-    response, info = fetch_url(module, auth_url, method='POST', headers=headers, data=data_json)
+    response, info = fetch_url(module,
+                               auth_url,
+                               method='POST',
+                               headers=headers,
+                               data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to enable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
+        module.fail_json(
+            msg="Unable to enable auth backend '{0!s}' ({1!s})".format(
+                module.params['mountpoint'], info['msg'])
+            )
 
     module.exit_json(changed=True, **data)
 
@@ -142,10 +157,16 @@ def auth_absent(module, url):
     if module.params['mountpoint']+'/' not in auth_list:
         module.exit_json(changed=False)
 
-    response, info = fetch_url(module, auth_url, method='DELETE', headers=headers)
+    response, info = fetch_url(module,
+                               auth_url,
+                               method='DELETE',
+                               headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to disable auth backend '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
+        module.fail_json(
+            msg="Unable to disable auth backend '{0!s}' ({1!s})".format(
+                module.params['mountpoint'], info['msg'])
+            )
 
     module.exit_json(changed=True)
 
@@ -156,7 +177,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, default=None, type='str'),
-            state=dict(required=True, choices=['present', 'absent', 'remount']),
+            state=dict(required=True,
+                       vchoices=['present', 'absent', 'remount']),
             mountpoint=dict(required=True, default=None, type='str'),
             type=dict(required=False, default=None, type='str'),
             description=dict(required=False, default='', type='str'),
@@ -181,8 +203,5 @@ def main():
     if state == 'absent':
         auth_absent(module, url)
 
-
-from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
 
 main()
