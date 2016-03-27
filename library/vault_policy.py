@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import json
+from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 
 DOCUMENTATION = '''
 ---
@@ -49,7 +51,8 @@ options:
     choices: ['yes', 'no']
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated. This should only
+      - be used on personally controlled sites using self-signed certificates.
     required: false
     default: 'yes'
     choices: ['yes', 'no']
@@ -91,10 +94,14 @@ def get_policies(module, url):
     policy_url = url + '/v1/sys/policy'
     headers = {"X-Vault-Token": module.params['token']}
 
-    response, info = fetch_url(module, policy_url, method='GET', headers=headers)
+    response, info = fetch_url(module,
+                               policy_url,
+                               method='GET',
+                               headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch policy list ({0!s})".format(info['msg']))
+        module.fail_json(
+            msg="Unable to fetch policy list ({0!s})".format(info['msg']))
 
     return json.loads(response.read())
 
@@ -109,10 +116,18 @@ def policy_present(module, url):
     }
     data_json = json.dumps(data)
 
-    response, info = fetch_url(module, policy_url, method='POST', headers=headers, data=data_json)
+    response, info = fetch_url(module,
+                               policy_url,
+                               method='POST',
+                               headers=headers,
+                               data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to create policy '{0!s}' ({1!s})".format(module.params['policy'], info['msg']))
+        module.fail_json(
+            msg="Unable to create policy '{0!s}' ({1!s})".format(
+                module.params['policy'],
+                info['msg'])
+            )
 
     module.exit_json(changed=True)
 
@@ -127,10 +142,17 @@ def policy_absent(module, url):
     if module.params['policy_name'] not in policy_list['policies']:
         module.exit_json(changed=False)
 
-    response, info = fetch_url(module, policy_url, method='DELETE', headers=headers)
+    response, info = fetch_url(module,
+                               policy_url,
+                               method='DELETE',
+                               headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to remove policy '{0!s}' ({1!s})".format(module.params['policy'], info['msg']))
+        module.fail_json(
+            msg="Unable to remove policy '{0!s}' ({1!s})".format(
+                module.params['policy'],
+                info['msg'])
+            )
 
     module.exit_json(changed=True)
 
@@ -165,8 +187,5 @@ def main():
     if state == 'absent':
         policy_absent(module, url)
 
-
-from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
 
 main()
