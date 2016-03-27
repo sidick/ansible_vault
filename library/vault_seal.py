@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import json
+from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 
 DOCUMENTATION = '''
 ---
@@ -46,7 +48,8 @@ options:
     choices: ['yes', 'no']
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated. This should only
+      - be used on personally controlled sites using self-signed certificates.
     required: false
     default: 'yes'
     choices: ['yes', 'no']
@@ -94,7 +97,10 @@ def vault_seal(module, url, token):
     if module.check_mode:
         module.exit_json(changed=True)
 
-    response, info = fetch_url(module, seal_url, method='POST', headers=headers)
+    response, info = fetch_url(module,
+                               seal_url,
+                               method='POST',
+                               headers=headers)
 
     if info['status'] != 200 and info['status'] != 204:
         module.fail_json(msg="Failed to seal vault")
@@ -113,7 +119,10 @@ def vault_unseal(module, url, key):
     response, info = fetch_url(module, unseal_url, method='POST', data=data)
 
     if info['status'] != 200 and info['status'] != 204:
-        module.fail_json(msg="Unable to unseal vault ({0!s})".format(info['msg']))
+        module.fail_json(
+            msg="Unable to unseal vault ({0!s})".format(
+                info['msg'])
+            )
 
     result = json.loads(response.read())
 
@@ -129,7 +138,10 @@ def vault_seal_status(module, url):
     if info['status'] == 200:
         return json.loads(response.read())
 
-    module.fail_json(msg="Failed to get vault status ({0!s})".format(info['msg']))
+    module.fail_json(
+        msg="Failed to get vault status ({0!s})".format(
+            info['msg'])
+        )
 
 
 def vault_reset(module, url, token):
@@ -141,10 +153,17 @@ def vault_reset(module, url, token):
     if module.check_mode:
         module.exit_json(changed=True)
 
-    response, info = fetch_url(module, reset_url, method='POST', headers=headers, data=data)
+    response, info = fetch_url(module,
+                               reset_url,
+                               method='POST',
+                               headers=headers,
+                               data=data)
 
     if info['status'] != 200 and info['status'] != 204:
-        module.fail_json(msg="Unable to reset vault unseal ({0!s})".format(info['msg']))
+        module.fail_json(
+            msg="Unable to reset vault unseal ({0!s})".format(
+                info['msg'])
+            )
 
     result = json.loads(response.read())
 
@@ -152,6 +171,7 @@ def vault_reset(module, url, token):
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
@@ -195,8 +215,5 @@ def main():
 
     return module.fail_json(msg="Unknown usage")
 
-
-from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
 
 main()

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import json
+from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 
 DOCUMENTATION = '''
 ---
@@ -11,7 +13,8 @@ description:
 options:
   token:
     description:
-      - Authentication token - If this isn't provided only things like Seal Status and HA Status will be populated
+      - Authentication token - If this isn't provided only things
+      - like Seal Status and HA Status will be populated
     required: false
   server:
     description:
@@ -33,7 +36,8 @@ options:
     choices: ['yes', 'no']
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated. This should only
+      - be used on personally controlled sites using self-signed certificates.
     required: false
     default: 'yes'
     choices: ['yes', 'no']
@@ -72,7 +76,10 @@ def vault_seal_status(module, url):
     if info['status'] == 200:
         return json.loads(response.read())
 
-    module.fail_json(msg="Failed to get vault status ({0!s})".format(info['msg']))
+    module.fail_json(
+        msg="Failed to get vault status ({0!s})".format(
+            info['msg'])
+        )
 
 
 def get_list(module, url, type):
@@ -83,7 +90,10 @@ def get_list(module, url, type):
     response, info = fetch_url(module, api_url, method='GET', headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch {0!s} list ({1!s})".format(type, info['msg']))
+        module.fail_json(
+            msg="Unable to fetch {0!s} list ({1!s})".format(
+                type, info['msg'])
+            )
 
     return json.loads(response.read())
 
@@ -97,7 +107,10 @@ def vault_leader_status(module, url):
     if info['status'] == 200:
         return json.loads(response.read())
 
-    module.fail_json(msg="Failed to get vault leader status ({0!s})".format(info['msg']))
+    module.fail_json(
+        msg="Failed to get vault leader status ({0!s})".format(
+            info['msg'])
+        )
 
 
 def vault_facts(module, url):
@@ -117,6 +130,7 @@ def vault_facts(module, url):
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
@@ -140,8 +154,5 @@ def main():
 
     return module.fail_json(msg="Can't gather Vault facts")
 
-
-from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
 
 main()

@@ -1,0 +1,76 @@
+---
+
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: False
+  become: False
+  vars_files:
+    - ../group_vars/vault
+  vars:
+    travis: "{{ lookup('env', 'TRAVIS') }}"
+
+  tasks:
+    - include: test-vault-credentials.yml
+
+    - name: Enable file audit backend
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest'
+        tls: off
+        state: present
+        type: file
+        file_path: '/tmp/vault_audit.log'
+        description: 'Generic file audit backend'
+
+    - name: Enable file audit backend (should show no changes)
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest'
+        tls: off
+        state: present
+        type: file
+        file_path: '/tmp/vault_audit.log'
+        description: 'Generic file audit backend'
+
+    - name: Disable file audit backend
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest'
+        tls: off
+        state: absent
+
+    - name: Disable file audit backend (should show no changes)
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest'
+        tls: off
+        state: absent
+
+    - name: Enable syslog audit backend
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest2'
+        tls: off
+        state: present
+        type: syslog
+        tag: 'vaulttest'
+        description: 'Generic syslog audit backend'
+      when: travis != 'true'
+
+    - name: Enable syslog audit backend (should show no changes)
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest2'
+        tls: off
+        state: present
+        type: syslog
+        tag: 'vaulttest'
+        description: 'Generic syslog audit backend'
+      when: travis != 'true'
+
+    - name: Disable syslog audit backend
+      vault_audit_backend:
+        token: "{{ vault_token }}"
+        mountpoint: 'audittest2'
+        tls: off
+        state: absent

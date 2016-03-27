@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import json
+from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 
 DOCUMENTATION = '''
 ---
@@ -34,7 +36,8 @@ options:
     default: null
   type:
     description:
-      - Sets the type of the mountpoint from the list at https://www.vaultproject.io/docs/secrets/index.html
+      - Sets the type of the mountpoint from the list at
+      - https://www.vaultproject.io/docs/secrets/index.html
     required: false
     default: null
   description:
@@ -72,7 +75,8 @@ options:
     choices: ['yes', 'no']
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated. This should only
+      - be used on personally controlled sites using self-signed certificates.
     required: false
     default: 'yes'
     choices: ['yes', 'no']
@@ -124,10 +128,16 @@ def get_mounts(module, url):
     mount_url = url + '/v1/sys/mounts'
     headers = {"X-Vault-Token": module.params['token']}
 
-    response, info = fetch_url(module, mount_url, method='GET', headers=headers)
+    response, info = fetch_url(module,
+                               mount_url,
+                               method='GET',
+                               headers=headers)
 
     if info['status'] != 200:
-        module.fail_json(msg="Unable to fetch mount list ({0!s})".format(info['msg']))
+        module.fail_json(
+            msg="Unable to fetch mount list ({0!s})".format(
+                info['msg'])
+            )
 
     return json.loads(response.read())
 
@@ -153,10 +163,18 @@ def mount_present(module, url):
         # TODO: Add code in here to change the lease parameters
         module.exit_json(changed=False, **data)
 
-    response, info = fetch_url(module, mount_url, method='POST', headers=headers, data=data_json)
+    response, info = fetch_url(module,
+                               mount_url,
+                               method='POST',
+                               headers=headers,
+                               data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to mount '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
+        module.fail_json(
+            msg="Unable to mount '{0!s}' ({1!s})".format(
+                module.params['mountpoint'],
+                info['msg'])
+            )
 
     module.exit_json(changed=True, **data)
 
@@ -171,10 +189,17 @@ def mount_absent(module, url):
     if module.params['mountpoint']+'/' not in mount_list:
         module.exit_json(changed=False)
 
-    response, info = fetch_url(module, mount_url, method='DELETE', headers=headers)
+    response, info = fetch_url(module,
+                               mount_url,
+                               method='DELETE',
+                               headers=headers)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to unmount '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
+        module.fail_json(
+            msg="Unable to unmount '{0!s}' ({1!s})".format(
+                module.params['mountpoint'],
+                info['msg'])
+            )
 
     module.exit_json(changed=True)
 
@@ -194,25 +219,41 @@ def mount_remount(module, url):
     mount_list = get_mounts(module, url)
 
     if module.params['mountpoint']+'/' not in mount_list:
-        module.fail_json(msg="Mountpoint '{0!s}' not available to remount".format(module.params['mountpoint']))
+        module.fail_json(
+            msg="Mountpoint '{0!s}' not available to remount".format(
+                module.params['mountpoint'])
+            )
 
     if module.params['new_mountpoint']+'/' in mount_list:
-        module.fail_json(msg="New mountpoint already exists: {0!s}".format(module.params['new_mountpoint']))
+        module.fail_json(
+            msg="New mountpoint already exists: {0!s}".format(
+                module.params['new_mountpoint'])
+            )
 
-    response, info = fetch_url(module, mount_url, method='POST', headers=headers, data=data_json)
+    response, info = fetch_url(module,
+                               mount_url,
+                               method='POST',
+                               headers=headers,
+                               data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to remount '{0!s}' ({1!s})".format(module.params['mountpoint'], info['msg']))
+        module.fail_json(
+            msg="Unable to remount '{0!s}' ({1!s})".format(
+                module.params['mountpoint'],
+                info['msg'])
+            )
 
     module.exit_json(changed=True, msg="blah", **data)
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, default=None, type='str'),
-            state=dict(required=True, choices=['present', 'absent', 'remount']),
+            state=dict(required=True,
+                       choices=['present', 'absent', 'remount']),
             mountpoint=dict(required=True, default=None, type='str'),
             new_mountpoint=dict(required=False, default=None, type='str'),
             type=dict(required=False, default=None, type='str'),
@@ -242,8 +283,5 @@ def main():
     if state == 'remount':
         mount_remount(module, url)
 
-
-from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
 
 main()

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import json
+from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 
 DOCUMENTATION = '''
 ---
@@ -20,7 +22,8 @@ options:
     default: 'token'
   auth:
     description:
-      - List of key/value pairs to use to authenticate against the appropriate backend
+      - List of key/value pairs to use to authenticate against
+      - the appropriate backend
     required: true
   no_verify:
     description:
@@ -34,7 +37,8 @@ options:
     default: null
   value:
     description:
-      - The contents of the secret, obviously this is only relevant when state=present
+      - The contents of the secret, obviously this is
+      - only relevant when state=present
     required: false
     default: null
   server:
@@ -57,7 +61,8 @@ options:
     choices: ['yes', 'no']
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated. This should only
+      - be used on personally controlled sites using self-signed certificates.
     required: false
     default: 'yes'
     choices: ['yes', 'no']
@@ -114,7 +119,10 @@ def vault_auth(module, url):
     if method in auth_methods:
         for param in auth_methods[method]:
             if param not in auth:
-                module.fail_json(msg="{0!s} is required for the {1!s} method".format(param, method))
+                module.fail_json(
+                    msg="{0!s} is required for the {1!s} method".format(
+                        param, method)
+                    )
 
         data = auth
         auth_url = auth_url + 'auth/' + method + '/login'
@@ -130,13 +138,17 @@ def vault_auth(module, url):
     response, info = fetch_url(module, auth_url, method='POST', data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to authenticate ({0!s})".format(info['msg']))
+        module.fail_json(
+            msg="Unable to authenticate ({0!s})".format(
+                info['msg'])
+            )
 
     ret = json.loads(response.read())
     module.exit_json(changed=True, **ret['auth'])
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
@@ -161,8 +173,5 @@ def main():
 
     return module.fail_json(msg="Unknown usage absent = {0!s}".format(state))
 
-
-from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
 
 main()

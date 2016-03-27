@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import json
+from ansible.module_utils.basic import *
+from ansible.module_utils.urls import *
 
 DOCUMENTATION = '''
 ---
@@ -15,9 +17,8 @@ options:
     required: true
   state:
     description:
-      - Allows you to specify whether the named secret should be present or absent
-      - C(present)
-      - C(absent)
+      - Allows you to specify whether the named secret should be
+      - C(present) or C(absent)
     required: true
     default: null
     choices: ['present', 'absent']
@@ -28,7 +29,8 @@ options:
     default: null
   value:
     description:
-      - The contents of the secret, obviously this is only relevant when state=present
+      - The contents of the secret, obviously this is only
+      - relevant when state=present
     required: false
     default: null
   server:
@@ -51,7 +53,8 @@ options:
     choices: ['yes', 'no']
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated. This should only
+      - be used on personally controlled sites using self-signed certificates.
     required: false
     default: 'yes'
     choices: ['yes', 'no']
@@ -95,7 +98,10 @@ def vault_secret_exist(module, url, token, secret):
     secret_url = url + '/v1/' + secret
     headers = {"X-Vault-Token": token}
 
-    response, info = fetch_url(module, secret_url, method='GET', headers=headers)
+    response, info = fetch_url(module,
+                               secret_url,
+                               method='GET',
+                               headers=headers)
 
     if info['status'] == 200:
         return True
@@ -107,10 +113,17 @@ def vault_set(module, url, token, secret, key):
     secret_url = url + '/v1/' + secret
     headers = {"X-Vault-Token": token}
 
-    response, info = fetch_url(module, secret_url, method='POST', headers=headers, data=json.dumps(key))
+    response, info = fetch_url(module,
+                               secret_url,
+                               method='POST',
+                               headers=headers,
+                               data=json.dumps(key))
 
     if info['status'] != 200 and info['status'] != 204:
-        module.fail_json(msg="Failed to write secret ({0!s})".format(info['msg']))
+        module.fail_json(
+            msg="Failed to write secret ({0!s})".format(
+                info['msg'])
+            )
 
     module.exit_json(changed=True)
 
@@ -120,15 +133,22 @@ def vault_remove(module, url, token, secret):
     secret_url = url + '/v1/' + secret
     headers = {"X-Vault-Token": token}
 
-    response, info = fetch_url(module, secret_url, method='DELETE', headers=headers)
+    response, info = fetch_url(module,
+                               secret_url,
+                               method='DELETE',
+                               headers=headers)
 
     if info['status'] != 200 and info['status'] != 204:
-        module.fail_json(msg="Failed to remove secret ({0!s})".format(info['msg']))
+        module.fail_json(
+            msg="Failed to remove secret ({0!s})".format(
+                info['msg'])
+            )
 
     module.exit_json(changed=True)
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
@@ -165,8 +185,5 @@ def main():
 
     return module.fail_json(msg="Unknown usage absent = {0!s}".format(state))
 
-
-from ansible.module_utils.basic import *
-from ansible.module_utils.urls import *
 
 main()
