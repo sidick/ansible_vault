@@ -98,6 +98,7 @@ EXAMPLES = '''
 
 
 def make_vault_url(vault_server, vault_port, vault_tls):
+    """ Create base Vault URL """
     vault_url = ''
     if vault_tls:
         vault_url = 'https://'
@@ -110,6 +111,7 @@ def make_vault_url(vault_server, vault_port, vault_tls):
 
 
 def get_auth_token(module, url, id):
+    """ Get details for a named token """
     auth_url = url + '/v1/auth/token/lookup/' + id
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -123,6 +125,7 @@ def get_auth_token(module, url, id):
 
 
 def token_present(module, url):
+    """ Make sure token is present """
     auth_url = url + '/v1/auth/token/create'
     headers = {"X-Vault-Token": module.params['token']}
 
@@ -163,6 +166,7 @@ def token_present(module, url):
 
 
 def main():
+    """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
