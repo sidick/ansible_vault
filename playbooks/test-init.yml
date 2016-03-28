@@ -15,3 +15,17 @@
         shares: 5
         threshold: 3
         tls: off
+
+    - name: Initialise the Vault
+      vault_init:
+        shares: 5
+        threshold: 3
+        tls: off
+        port: 8201
+
+    - name: Initialise the Vault (should show no change)
+      vault_init:
+        shares: 5
+        threshold: 3
+        tls: off
+        port: 8201

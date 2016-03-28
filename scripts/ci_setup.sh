@@ -12,6 +12,7 @@ chmod +x $PWD/bin/vault
 
 export PATH=$PATH:$PWD/bin
 
+vault server -config=data/vault.hcl >/tmp/vault_output_full &
 vault server -dev >/tmp/vault_output &
 
 sleep 1
