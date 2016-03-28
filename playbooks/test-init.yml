@@ -1,0 +1,17 @@
+---
+
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: False
+  become: False
+  vars_files:
+    - ../group_vars/vault
+
+  tasks:
+    - include: test-vault-credentials.yml
+
+    - name: Initialise the Vault (should show no change)
+      vault_init:
+        shares: 5
+        threshold: 3
+        tls: off
