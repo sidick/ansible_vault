@@ -24,6 +24,9 @@ Currently the modules available include:
 They can be used by copying the contents of the library directory to the library
 directory in which you're working.
 
+I haven't written a lookup plugin, but there is one at
+<https://github.com/jhaals/ansible-vault>
+
 Author
 ======
 Simon Dick - <simond@irrelevant.org>
