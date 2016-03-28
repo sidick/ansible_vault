@@ -98,7 +98,7 @@ def vault_init(module, url):
 
     data_json = json.dumps(data)
 
-    response, info = fetch_url(module, auth_url, method='POST', data=data_json)
+    response, info = fetch_url(module, init_url, method='PUT', data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
         module.fail_json(
