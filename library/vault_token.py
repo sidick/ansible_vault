@@ -117,7 +117,7 @@ def get_auth_token(module, url, id):
 
     if info['status'] != 200:
         return False
-        module.fail_json(msg="Unable to fetch auth backend list (%s)" % info['msg'])
+        module.fail_json(msg="Unable to fetch auth backend list ({0!s})".format(info['msg']))
 
     return json.loads(response.read())
 
@@ -155,7 +155,7 @@ def token_present(module, url):
     response, info = fetch_url(module, auth_url, method='POST', headers=headers, data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
-        module.fail_json(msg="Unable to create token '%s' (%s)" % (module.params['id'], info['msg']))
+        module.fail_json(msg="Unable to create token '{0!s}' ({1!s})".format(module.params['id'], info['msg']))
 
     ret = json.loads(response.read())
 
