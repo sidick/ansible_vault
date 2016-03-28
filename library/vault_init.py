@@ -92,8 +92,9 @@ def vault_init(module, url):
         module.exit_json(changed=False)
 
     data = {
-        'secret_shares': str(module.params['shares']),
-        'secret_threshold': str(module.params['threshold'])
+        'secret_shares': module.params['shares'],
+        'secret_threshold': module.params['threshold'],
+        'pgp_keys': None
     }
 
     data_json = json.dumps(data)
