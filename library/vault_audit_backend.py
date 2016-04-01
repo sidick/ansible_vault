@@ -181,6 +181,9 @@ def audit_present(module, url):
     if module.params['mountpoint']+'/' in audit_list:
         module.exit_json(changed=False, **data)
 
+    if module.check_mode:
+        module.exit_json(changed=True)
+
     response, info = fetch_url(module,
                                audit_url,
                                method='POST',
@@ -206,6 +209,9 @@ def audit_absent(module, url):
 
     if module.params['mountpoint']+'/' not in audit_list:
         module.exit_json(changed=False)
+
+    if module.check_mode:
+        module.exit_json(changed=True)
 
     response, info = fetch_url(module,
                                audit_url,
@@ -242,7 +248,7 @@ def main():
             tls=dict(required=False, default=True, type='bool'),
             validate_certs=dict(required=False, default=True, type='bool')
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     state = module.params['state']

@@ -135,6 +135,9 @@ def vault_auth(module, url):
 
     data_json = json.dumps(data)
 
+    if module.check_mode:
+        module.exit_json(changed=True, client_token='dummy')
+
     response, info = fetch_url(module, auth_url, method='POST', data=data_json)
 
     if info['status'] != 204 and info['status'] != 200:
@@ -160,7 +163,7 @@ def main():
             tls=dict(required=False, default=True, type='bool'),
             validate_certs=dict(required=False, default=True, type='bool'),
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     vault_port = module.params['port']

@@ -116,6 +116,9 @@ def policy_present(module, url):
     }
     data_json = json.dumps(data)
 
+    if module.check_mode:
+        module.exit_json(changed=True)
+
     response, info = fetch_url(module,
                                policy_url,
                                method='POST',
@@ -141,6 +144,9 @@ def policy_absent(module, url):
 
     if module.params['policy_name'] not in policy_list['policies']:
         module.exit_json(changed=False)
+
+    if module.check_mode:
+        module.exit_json(changed=True)
 
     response, info = fetch_url(module,
                                policy_url,
@@ -171,7 +177,7 @@ def main():
             tls=dict(required=False, default=True, type='bool'),
             validate_certs=dict(required=False, default=True, type='bool')
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     state = module.params['state']
