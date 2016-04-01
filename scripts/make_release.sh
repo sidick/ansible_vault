@@ -6,12 +6,14 @@ fi
 
 VERSION=$1
 
+mkdir -p build
+
 echo "Creating release tag"
 git checkout master && git pull
 github-release release -u sidick -r ansible_vault -t v${VERSION} -p
 
 echo "Creating archive"
-tar cjf ansible_vault-v${VERSION}.tar.bz2 README.md library
+tar cjf build/ansible_vault.tbz README.md library
 
 echo "Upload release archive"
-github-release upload -u sidick -r ansible_vault -t v${VERSION} -n ansible_vault-v${VERSION}.tar.bz2 -f ansible_vault-v${VERSION}.tar.bz2
+github-release upload -u sidick -r ansible_vault -t v${VERSION} -n ansible_vault-v${VERSION}.tar.bz2 -f build/ansible_vault.tbz
