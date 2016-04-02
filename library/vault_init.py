@@ -91,6 +91,9 @@ def vault_init(module, url):
     if check_vault_is_initialised(module, url):
         module.exit_json(changed=False)
 
+    if module.check_mode:
+        module.exit_json(changed=True)
+
     data = {
         'secret_shares': module.params['shares'],
         'secret_threshold': module.params['threshold'],
@@ -123,7 +126,7 @@ def main():
             tls=dict(required=False, default=True, type='bool'),
             validate_certs=dict(required=False, default=True, type='bool'),
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     vault_port = module.params['port']

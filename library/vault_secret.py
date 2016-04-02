@@ -113,6 +113,9 @@ def vault_set(module, url, token, secret, key):
     secret_url = url + '/v1/' + secret
     headers = {"X-Vault-Token": token}
 
+    if module.check_mode:
+        module.exit_json(changed=True)
+
     response, info = fetch_url(module,
                                secret_url,
                                method='POST',
@@ -161,7 +164,7 @@ def main():
             secret=dict(required=True, default=None, type='str'),
             key=dict(required=False, default=None, type='dict')
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     state = module.params['state']

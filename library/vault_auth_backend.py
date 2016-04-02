@@ -132,6 +132,9 @@ def auth_present(module, url):
     if module.params['mountpoint']+'/' in auth_list:
         module.exit_json(changed=False, **data)
 
+    if module.check_mode:
+        module.exit_json(changed=True)
+
     response, info = fetch_url(module,
                                auth_url,
                                method='POST',
@@ -156,6 +159,9 @@ def auth_absent(module, url):
 
     if module.params['mountpoint']+'/' not in auth_list:
         module.exit_json(changed=False)
+
+    if module.check_mode:
+        module.exit_json(changed=True)
 
     response, info = fetch_url(module,
                                auth_url,
@@ -187,7 +193,7 @@ def main():
             tls=dict(required=False, default=True, type='bool'),
             validate_certs=dict(required=False, default=True, type='bool')
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     state = module.params['state']
