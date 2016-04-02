@@ -1,6 +1,7 @@
 ---
 
 # Sealing test playbook
+- include: playbooks/test-init.yml
 - include: playbooks/test-seal.yml
 - include: playbooks/test-facts.yml
 - include: playbooks/test-secrets.yml
