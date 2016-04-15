@@ -17,11 +17,17 @@ options:
     description:
       - Lets you set the state of the authentication token
       - C(present) makes sure the token exists
-      - C(renew) makes sure the token is renewed
-      - C(revoke) makes sure the token is revoked
+      - C(renew) renews a lease associated with a token. This is used to prevent the expiration of a token, and the automatic revocation of it. Token renewal is possible only if there is a lease associated with it
+      - C(revoke) revokes a token and all child tokens. When the token is revoked, all secrets generated with it are also revoked
     required: true
     default: null
     choices: ['present', 'renew', 'revoke']
+  mode:
+    description:
+      - Select type of blah
+    required: false
+    default: normal
+    choices: ['normal', 'self', 'orphan', 'path']
   id:
     description:
       - The requested ID of the token, this can only be used when authenticating using a root token
@@ -165,15 +171,49 @@ def token_present(module, url):
     module.exit_json(changed=True, **ret['auth'])
 
 
+def token_renew_self(module, url):
+    """ Renew authenticated token """
+    renew_url = url + '/v1/auth/token/renew-self'
+
+    headers = {"X-Vault-Token": module.params['token']}
+    data = {}
+
+    data_json = json.dumps(data)
+
+    response, info = fetch_url(module, renew_url, method='POST', headers=headers, data=data_json)
+
+    if info['status'] != 204 and info['status'] != 200:
+      ret = json.loads(response.read())
+      module.fail_json(msg="Unable to renew token, can't be found or is not renewable")
+
+    ret = json.loads(response.read())
+
+    module.exit_json(changed=True, **ret['auth'])
+
+
+def token_renew(module, url):
+    """ Renew token """
+
+    renew_mode = module.params['mode']
+    if renew_mode == 'self':
+      token_renew_self(module, url)
 def main():
     """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, default=None, type='str'),
-            state=dict(required=True, choices=['present', 'renew', 'revoke']),
+            state=dict(required=True, choices=[ 'present',
+                                                'renew',
+                                                'revoke'
+                                            ]),
             id=dict(required=False, default=None, type='str'),
             policies=dict(required=False, default=None, type='list'),
+            mode=dict(required=False, default='normal', choices=['normal',
+                                                                 'orphan',
+                                                                 'path',
+                                                                 'self'
+            ]),
             no_parent=dict(required=False, default=False, type='bool'),
             no_default_policy=dict(required=False, default=False, type='bool'),
             ttl=dict(required=False, default='', type='str'),
@@ -197,6 +237,8 @@ def main():
 
     if state == 'present':
         token_present(module, url)
+    if state == 'renew':
+        token_renew(module, url)
 
 
 
