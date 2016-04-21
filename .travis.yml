@@ -15,15 +15,15 @@ env:
     - VAULT_VER="0.5.2"
       ANSIBLE_VER="1.9.6"
     - VAULT_VER="0.4.0"
-      ANSIBLE_VER="2.0.1.0"
+      ANSIBLE_VER="2.0.2.0"
     - VAULT_VER="0.4.1"
-      ANSIBLE_VER="2.0.1.0"
+      ANSIBLE_VER="2.0.2.0"
     - VAULT_VER="0.5.0"
-      ANSIBLE_VER="2.0.1.0"
+      ANSIBLE_VER="2.0.2.0"
     - VAULT_VER="0.5.1"
-      ANSIBLE_VER="2.0.1.0"
+      ANSIBLE_VER="2.0.2.0"
     - VAULT_VER="0.5.2"
-      ANSIBLE_VER="2.0.1.0"
+      ANSIBLE_VER="2.0.2.0"
 sudo: false
 notifications:
   email:
