@@ -4,7 +4,6 @@ ansible-vault
 Branch | Travis Status | Code Issues
 -------|-------|----
 master | [![Build Status](https://travis-ci.org/sidick/ansible_vault.svg?branch=master)](https://travis-ci.org/sidick/ansible_vault) | [![Code Issues](https://www.quantifiedcode.com/api/v1/project/d9069ae56d9e4dd890ba6046345530a9/snapshot/origin:master:HEAD/badge.svg)](https://www.quantifiedcode.com/app/project/d9069ae56d9e4dd890ba6046345530a9)
-devel | [![Build Status](https://travis-ci.org/sidick/ansible_vault.svg?branch=devel)](https://travis-ci.org/sidick/ansible_vault) | [![Code Issues](https://www.quantifiedcode.com/api/v1/project/d9069ae56d9e4dd890ba6046345530a9/snapshot/origin:devel:HEAD/badge.svg)](https://www.quantifiedcode.com/app/project/d9069ae56d9e4dd890ba6046345530a9)
 
 ansible-vault is a way of providing a number of Ansible modules to make working
 with [Ansible] and [Vault]
