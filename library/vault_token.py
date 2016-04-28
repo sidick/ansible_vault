@@ -24,7 +24,7 @@ options:
     choices: ['present', 'renew', 'revoke']
   mode:
     description:
-      - Select type of blah
+      - Select type of token required
     required: false
     default: normal
     choices: ['normal', 'self', 'orphan', 'path']
