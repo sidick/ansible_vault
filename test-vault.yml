@@ -10,3 +10,4 @@
 - include: playbooks/test-audit-backend.yml
 - include: playbooks/test-policy.yml
 - include: playbooks/test-auth.yml
+- include: playbooks/test-tokens.yml
