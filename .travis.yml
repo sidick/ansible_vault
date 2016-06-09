@@ -4,8 +4,6 @@ python:
   - "2.7"
 env:
   matrix:
-    - VAULT_VER="0.4.0"
-      ANSIBLE_VER="1.9.6"
     - VAULT_VER="0.4.1"
       ANSIBLE_VER="1.9.6"
     - VAULT_VER="0.5.0"
@@ -17,8 +15,6 @@ env:
     - VAULT_VER="0.6.0-rc1"
       ANSIBLE_VER="1.9.6"
 
-    - VAULT_VER="0.4.0"
-      ANSIBLE_VER="2.0.2.0"
     - VAULT_VER="0.4.1"
       ANSIBLE_VER="2.0.2.0"
     - VAULT_VER="0.5.0"
@@ -30,8 +26,6 @@ env:
     - VAULT_VER="0.6.0-rc1"
       ANSIBLE_VER="2.0.2.0"
 
-    - VAULT_VER="0.4.0"
-      ANSIBLE_VER="2.1"
     - VAULT_VER="0.4.1"
       ANSIBLE_VER="2.1"
     - VAULT_VER="0.5.0"
