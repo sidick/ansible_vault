@@ -18,6 +18,7 @@ Currently the modules available include:
 * vault_policy
 * vault_secret
 * vault_seal
+* vault_token
 
 They can be used by copying the contents of the library directory to the library
 directory in which you're working.

@@ -7,7 +7,7 @@ DOCUMENTATION = '''
 module: vault_token
 short_description: Manage Vault Authentication Tokens
 description:
-  - Add Vault authentication tokens
+  - Manage Vault authentication tokens
 options:
   token:
     description:
@@ -17,9 +17,10 @@ options:
     description:
       - Lets you set the state of the authentication token
       - C(present) makes sure the token exists
+      - C(renew) attempts to renew the token
     required: true
     default: null
-    choices: ['present']
+    choices: ['present', 'renew']
   mode:
     description:
       - Select type of token required
@@ -164,13 +165,42 @@ def token_present(module, url):
     module.exit_json(changed=True, **ret['auth'])
 
 
+def token_renew_self(module, url):
+    """ Renew authenticated token """
+    renew_url = url + '/v1/auth/token/renew-self'
+
+    headers = {"X-Vault-Token": module.params['token']}
+    data = {}
+
+    data_json = json.dumps(data)
+
+    response, info = fetch_url(module, renew_url, method='POST', headers=headers, data=data_json)
+
+    if info['status'] != 204 and info['status'] != 200:
+      ret = json.loads(response.read())
+      module.fail_json(msg="Unable to renew token, can't be found or is not renewable")
+
+    ret = json.loads(response.read())
+
+    module.exit_json(changed=True, **ret['auth'])
+
+
+def token_renew(module, url):
+    """ Renew token """
+
+    renew_mode = module.params['mode']
+    if renew_mode == 'self':
+      token_renew_self(module, url)
+
+
 def main():
     """ Main module function """
 
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, default=None, type='str'),
-            state=dict(required=True, choices=[ 'present'
+            state=dict(required=True, choices=[ 'present',
+                                                'renew'
                                             ]),
             id=dict(required=False, default=None, type='str'),
             policies=dict(required=False, default=None, type='list'),
@@ -202,6 +232,8 @@ def main():
 
     if state == 'present':
         token_present(module, url)
+    if state == 'renew':
+        token_renew(module, url)
 
 
 

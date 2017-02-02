@@ -52,3 +52,12 @@
         state: present
         ttl: 1h
       register: token_to_revoke
+
+    - name: Renew own token
+      vault_token:
+        token: "{{ token_to_revoke.client_token }}"
+        #token: "{{ vault_token }}"
+        tls: off
+        state: renew
+        mode: self
+
